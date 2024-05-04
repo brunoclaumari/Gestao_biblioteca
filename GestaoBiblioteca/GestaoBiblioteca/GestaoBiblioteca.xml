@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>GestaoBiblioteca</name>
+    </assembly>
+    <members>
+        <member name="M:GestaoBiblioteca.Controllers.WeatherForecastController.Get">
+            <summary>
+            Teste GetWeatherForecast
+            </summary>
+            <returns></returns>
+        </member>
+    </members>
+</doc>
