@@ -10,6 +10,12 @@ namespace GestaoBiblioteca.Repositories
 
         void Delete<T>(T entity) where T : EntidadePadrao;
 
+        Task<List<Livro>> GetAllLivrosAsync();
+
+        Task<Livro> GetLivroByIdAsync(int id);
+
         Task<bool> SaveChangesAsync();
+
+
     }
 }

@@ -1,0 +1,19 @@
+
+****Banco foi criado primeiro, os comandos abaixo foram para criar os Models a partir do banco de dados *******
+
+
+Scaffold-DbContext "Server=.\BRUNO;Database=GESTAO_BIBLIOTECA;User=sa;Password=1bruno*;Trusted_Connection=True;TrustServerCertificate=true;" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Entities -ContextDir BibliotecaContext
+
+
+
+
+
+
+
+
+
+
+
+
+
+

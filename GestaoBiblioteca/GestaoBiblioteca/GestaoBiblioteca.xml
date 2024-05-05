@@ -10,5 +10,11 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="P:GestaoBiblioteca.Entities.Emprestimo.StatusEmprestimo">
+            <summary>
+            <para>0 = Em aberto</para>
+            <para>1 = Devolvido</para>
+            </summary>
+        </member>
     </members>
 </doc>

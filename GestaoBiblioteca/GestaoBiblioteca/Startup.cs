@@ -1,17 +1,11 @@
-﻿using Microsoft.AspNetCore.Cors.Infrastructure;
-using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.OpenApi.Models;
+﻿using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Hosting;
-using Microsoft.AspNetCore.Mvc.ApiExplorer;
-using Microsoft.Extensions.Options;
 using System.Reflection;
+using GestaoBiblioteca.Context;
+using GestaoBiblioteca.Repositories;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace GestaoBiblioteca
 {
@@ -34,11 +28,11 @@ namespace GestaoBiblioteca
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            //services.AddDbContext<CourseContext>(
-            //    context => context.UseSqlServer(
-            //        Configuration.GetConnectionString("SqlServerConnection")
-            //    )
-            //);
+            services.AddDbContext<GestaoBibliotecaContext>(
+                context => context.UseSqlServer(
+                    Configuration.GetConnectionString("SqlServerConnection")
+                )
+            );
 
             //services.AddScoped<CourseService>();
             services.AddControllers(f =>
@@ -46,6 +40,11 @@ namespace GestaoBiblioteca
                 //f.Filters.Add<MyExceptionFilter>();
             });
 
+            services.AddControllers()
+                .AddNewtonsoftJson(
+                opt => opt.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore);
+
+            services.AddScoped<IRepository, Repository>();
 
             services.AddSwaggerGen(c =>
             {
