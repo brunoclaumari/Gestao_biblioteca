@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using GestaoBiblioteca.Entities;
+using GestaoBiblioteca.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace GestaoBiblioteca.Context;
@@ -41,13 +42,22 @@ public partial class GestaoBibliotecaContext : DbContext
             entity.Property(e => e.DataEmprestimo)
                 .HasColumnType("datetime")
                 .HasColumnName("data_emprestimo");
-            entity.Property(e => e.StatusEmprestimo).HasColumnName("status_emprestimo");
+
+
+            entity.Property(e => e.StatusEmprestimo)
+            .HasColumnName("status_emprestimo")
+            .HasDefaultValue(EnumEmprestimoStatus.EmAberto)            
+            .HasAnnotation("Relational:DefaultConstraintName", "DF_status"); ;
+            
+
             entity.Property(e => e.UsuarioId).HasColumnName("usuario_id");
 
             entity.HasOne(d => d.Usuario).WithMany(p => p.Emprestimos)
                 .HasForeignKey(d => d.UsuarioId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_tbEmprestimo_tbUsuario");
+            
+            
         });
 
         modelBuilder.Entity<ItensEmprestimo>(entity =>
@@ -103,6 +113,11 @@ public partial class GestaoBibliotecaContext : DbContext
             entity.Property(e => e.Nome)
                 .IsUnicode(false)
                 .HasColumnName("nome");
+
+            entity.Property(e => e.PossuiPendencias)
+            .HasDefaultValue(false)
+            //.HasDefaultValueSql("(CONVERT([bit],(0)))")
+            .HasAnnotation("Relational:DefaultConstraintName", "DF_possui_pendencias");
         });
 
         OnModelCreatingPartial(modelBuilder);

@@ -6,6 +6,8 @@ using System.Reflection;
 using GestaoBiblioteca.Context;
 using GestaoBiblioteca.Repositories;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Cors.Infrastructure;
+using GestaoBiblioteca.Services;
 
 namespace GestaoBiblioteca
 {
@@ -33,6 +35,8 @@ namespace GestaoBiblioteca
                     Configuration.GetConnectionString("SqlServerConnection")
                 )
             );
+
+            services.AddScoped<EmprestimoService>();
 
             //services.AddScoped<CourseService>();
             services.AddControllers(f =>
@@ -68,6 +72,13 @@ namespace GestaoBiblioteca
                 app.UseDeveloperExceptionPage();
                 //app.UseSwagger();
                 //app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "APICourse v1"));
+            }
+
+            // Verifica e aplica migrações ao iniciar o aplicativo
+            using (var scope = app.ApplicationServices.CreateScope())
+            {
+                var dbContext = scope.ServiceProvider.GetRequiredService<GestaoBibliotecaContext>();
+                dbContext.Database.MigrateAsync();
             }
 
             //app.UseHttpsRedirection();

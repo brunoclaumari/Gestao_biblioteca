@@ -16,5 +16,24 @@
             <para>1 = Devolvido</para>
             </summary>
         </member>
+        <member name="T:GestaoBiblioteca.Migrations.Inicia_Tabelas">
+            <inheritdoc />
+        </member>
+        <member name="M:GestaoBiblioteca.Migrations.Inicia_Tabelas.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:GestaoBiblioteca.Migrations.Inicia_Tabelas.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:GestaoBiblioteca.Migrations.Inicia_Tabelas.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:GestaoBiblioteca.Services.EmprestimoService.VerificaEmprestimoValido(GestaoBiblioteca.Entities.Emprestimo)">
+            <summary>
+            Faz verificações do usuário para ver se ele é válido
+            </summary>
+            <param name="emprestimo"></param>
+            <returns></returns>
+        </member>
     </members>
 </doc>

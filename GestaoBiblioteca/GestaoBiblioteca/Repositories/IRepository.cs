@@ -1,4 +1,5 @@
-﻿using GestaoBiblioteca.Entities;
+﻿using GestaoBiblioteca.Context;
+using GestaoBiblioteca.Entities;
 
 namespace GestaoBiblioteca.Repositories
 {
@@ -14,7 +15,21 @@ namespace GestaoBiblioteca.Repositories
 
         Task<Livro> GetLivroByIdAsync(int id);
 
+        Task<List<Emprestimo>> GetAllEmprestimosAsync();
+
+        Task<List<Emprestimo>> GetEmprestimosByUsuarioIdAsync(int usuarioId);
+
+        Task<Emprestimo> GetEmprestimoByIdAsync(int id);
+
+
+
         Task<bool> SaveChangesAsync();
+
+        void IniciaTransacaoAsync();
+
+        void ConfirmaTransacaoAsync();
+
+        void CancelaTransacaoAsync();        
 
 
     }

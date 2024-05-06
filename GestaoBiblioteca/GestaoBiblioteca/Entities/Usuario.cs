@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
@@ -19,6 +20,10 @@ public class Usuario : EntidadePadrao
 
     [Column("data_atualizacao")]
     public DateTime? DataAtualizacao { get; set; }
+
+    [Column("possui_pendencias")]
+    [DefaultValue(false)]
+    public bool PossuiPendencias { get; set; } = false;
 
     [JsonIgnore]
     public virtual ICollection<Emprestimo> Emprestimos { get; set; } = new List<Emprestimo>();

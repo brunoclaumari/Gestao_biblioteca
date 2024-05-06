@@ -1,8 +1,41 @@
 
 ****Banco foi criado primeiro, os comandos abaixo foram para criar os Models a partir do banco de dados *******
 
-
 Scaffold-DbContext "Server=.\BRUNO;Database=GESTAO_BIBLIOTECA;User=sa;Password=1bruno*;Trusted_Connection=True;TrustServerCertificate=true;" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Entities -ContextDir BibliotecaContext
+
+
+
+/***** MIGRATIONS NO VISUAL STUDIO ******/
+
+
+--Ajuda do entity
+
+get-help entityframeworkcore
+
+--adicionar uma migration
+
+Add-Migration nome_da_migration
+
+
+
+
+*****Passo a passo para executar em desenvolvimento*****
+
+Acertar a string de conexao com o SQL Server
+
+-No Package manager do Visual Studio, rodar
+	Add-Migration Inicia_Tabelas
+
+-No banco de dados executar os scripts numero 2 e numero 3
+
+
+
+
+
+
+
+
+
 
 
 

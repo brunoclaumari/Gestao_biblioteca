@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GestaoBiblioteca.Enums;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -21,7 +22,7 @@ public class Emprestimo : EntidadePadrao{
     /// <para>1 = Devolvido</para>
     /// </summary>
     [Column("status_emprestimo")]
-    public bool StatusEmprestimo { get; set; }
+    public EnumEmprestimoStatus StatusEmprestimo { get; set; } = EnumEmprestimoStatus.EmAberto;
 
     public virtual ICollection<ItensEmprestimo> ItensEmprestimos { get; set; } = new List<ItensEmprestimo>();
 
