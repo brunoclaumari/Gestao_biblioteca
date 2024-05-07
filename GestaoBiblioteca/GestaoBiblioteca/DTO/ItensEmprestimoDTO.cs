@@ -12,6 +12,6 @@ public class ItensEmprestimoDTO
     public int LivroId { get; set; }
 
     
-    public int EmprestimoId { get; set; }
+    //public int EmprestimoId { get; set; }
     
 }

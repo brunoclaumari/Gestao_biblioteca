@@ -1,5 +1,7 @@
 /* Procedures úteis no banco  */
 
+
+
 CREATE or ALTER PROCEDURE spDiminuirQuantidadeLivroPorID
     @livro_id INT
 AS

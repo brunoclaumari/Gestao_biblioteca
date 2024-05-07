@@ -22,4 +22,10 @@ public class Livro : EntidadePadrao
 
     [JsonIgnore]
     public virtual ICollection<ItensEmprestimo> ItensEmprestimos { get; set; } = new List<ItensEmprestimo>();
+
+
+    public override string ToString()
+    {
+        return $"Livro id: {Id}, título: {Titulo}";
+    }
 }

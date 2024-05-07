@@ -120,6 +120,18 @@ public partial class GestaoBibliotecaContext : DbContext
             .HasAnnotation("Relational:DefaultConstraintName", "DF_possui_pendencias");
         });
 
+        // Definindo ação de exclusão em cascata para tbItensEmprestimo
+        modelBuilder.Entity<ItensEmprestimo>()
+            .HasOne(ie => ie.Emprestimo)
+            .WithMany(e => e.ItensEmprestimos)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // Definindo ação de exclusão em cascata para tbEmprestimo
+        modelBuilder.Entity<Emprestimo>()
+            .HasMany(e => e.ItensEmprestimos)
+            .WithOne(ie => ie.Emprestimo)
+            .OnDelete(DeleteBehavior.Cascade);
+
         OnModelCreatingPartial(modelBuilder);
     }
 

@@ -18,4 +18,6 @@ public class ItensEmprestimo : EntidadePadrao
     public virtual Emprestimo Emprestimo { get; set; } = null!;
 
     public virtual Livro Livro { get; set; } = null!;
+
+
 }

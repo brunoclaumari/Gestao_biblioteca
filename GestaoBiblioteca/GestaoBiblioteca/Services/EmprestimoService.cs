@@ -1,8 +1,12 @@
 ﻿using GestaoBiblioteca.Context;
 using GestaoBiblioteca.DTO;
 using GestaoBiblioteca.Entities;
+using GestaoBiblioteca.Repositories;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using System.Linq;
+using System.Net;
 using System.Runtime.CompilerServices;
 
 namespace GestaoBiblioteca.Services
@@ -12,9 +16,13 @@ namespace GestaoBiblioteca.Services
 
         private readonly GestaoBibliotecaContext _context;
 
-        public EmprestimoService(GestaoBibliotecaContext context) {
+        private readonly IRepository _repo;
+
+        public EmprestimoService(GestaoBibliotecaContext context, IRepository repo)
+        {
             //context = new GestaoBibliotecaContext();
             _context = context;
+            _repo = repo;
         }
 
         /// <summary>
@@ -22,7 +30,7 @@ namespace GestaoBiblioteca.Services
         /// </summary>
         /// <param name="emprestimo"></param>
         /// <returns></returns>
-        public string VerificaEmprestimoValido(Emprestimo emprestimo)
+        public List<string> VerificaEmprestimoValido(Emprestimo emprestimo)
         {
             /*
              Um empréstimo de livro só pode ser permitido se:
@@ -31,7 +39,7 @@ namespace GestaoBiblioteca.Services
               * O livro estiver cadastrado no banco
               * Possuir livros disponíveis
              */
-
+            var listaErros = new List<string>();
             string mensagemErro = string.Empty;
 
             int usuarioId = emprestimo.UsuarioId;
@@ -39,6 +47,7 @@ namespace GestaoBiblioteca.Services
             if (usuario == null)
             {
                 mensagemErro = $"Não existe usuário com o id: {usuarioId} fornecido";
+                listaErros.Add(mensagemErro);
             }
             else
             {
@@ -46,19 +55,38 @@ namespace GestaoBiblioteca.Services
                 if(emprestimosPendentes != null && emprestimosPendentes.Count > 0)
                 {
                     mensagemErro = $"Usuário id: {usuarioId} possui empréstimos pendentes. Não é permitido novos empréstimos";
+                    listaErros.Add(mensagemErro);
                 }
             }
+            FazVerificacoesLivros(emprestimo, listaErros);
 
-            return mensagemErro;
+            return listaErros;
 
         }
 
-        private bool LivroExiste(Emprestimo emprestimo)
-        {
-            bool existe = false;
-            //existe = _context.Livros.Any(lv => lv.Id == emprestimo.ItensEmprestimos.Any(i=>i.LivroId == lv.Id));
+        private void FazVerificacoesLivros(Emprestimo emprestimo, List<string> listaErros)
+        {            
+            var listaLivros = _context.Livros.ToList();
 
-            return existe;
+            emprestimo.ItensEmprestimos.ToList().ForEach(x =>
+            {
+                var livro = listaLivros.FirstOrDefault(lv => lv.Id == x.LivroId);
+
+                //if (!listaLivros.Contains(x.Livro))
+                if (livro == null)
+                {
+                    string msg = $"O {x.Livro.ToString()} não está cadastrado.";
+                    listaErros.Add(msg);
+                }
+                else
+                {
+                    if(livro.QuantidadeTotal == 0)
+                    {
+                        string msg = $"Os exemplares do {x.Livro.ToString()} estão todos emprestados.";
+                        listaErros.Add(msg);
+                    }
+                }
+            });                        
         }
 
         public Emprestimo ConverteDTOParaEmprestimo(EmprestimoDTOEntrada dto)
@@ -69,65 +97,96 @@ namespace GestaoBiblioteca.Services
                 ItensEmprestimo item = new ItensEmprestimo
                 {
                     LivroId = i.LivroId,
-                    EmprestimoId = i.EmprestimoId,    
+                    //EmprestimoId = i.EmprestimoId,    
                 };
-                itensEmprestimos.Add(item);
-                //i.LivroId
+                itensEmprestimos.Add(item);                
             });
             Emprestimo emprestimo = new Emprestimo()
-            {
-                DataEmprestimo = dto.DataEmprestimo,
-                DataDevolucao = dto.DataDevolucao,
+            { 
                 ItensEmprestimos = itensEmprestimos,
                 StatusEmprestimo = dto.StatusEmprestimo,
                 UsuarioId = dto.UsuarioId,                
             };
 
+            if(dto is EmprestimoDTOUpdate)
+            {
+                emprestimo.DataEmprestimo = ((EmprestimoDTOUpdate)dto).DataEmprestimo;
+                emprestimo.DataDevolucao = ((EmprestimoDTOUpdate)dto).DataDevolucao;
+            }
+
             return emprestimo;
         }
 
-        //public static bool VerificaTabelaExiste(string nomeTabela, GestaoBibliotecaContext contextParam)
-        //{
-        //    bool tabelaExiste = false;
-        //    //DbContextOptions options = new();
-        //    var serviceProvider = new ServiceCollection()
-        //        .AddEntityFrameworkSqlServer()
-        //        .BuildServiceProvider();
-            
-        //    serviceProvider.GetRequiredService<GestaoBibliotecaContext>();
-        //    //using (GestaoBibliotecaContext context = new GestaoBibliotecaContext(serviceProvider.GetRequiredService<DbContextOptions<GestaoBibliotecaContext>>()))
-        //    //using (GestaoBibliotecaContext context = new GestaoBibliotecaContext()) 
-        //    //using (GestaoBibliotecaContext context = contextParam)
-        //    //{
-        //    //    string sql = $"SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '{nomeTabela}'";
-        //    //    tabelaExiste = context.Database.ExecuteSqlRaw(sql) > 0;
-        //    //}
-        //    string sql = $"SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '{nomeTabela}'";
-        //    tabelaExiste = contextParam.Database.ExecuteSqlRaw(sql) > 0;
+        
+        public async Task<CustomResponse> FazSalvar(EmprestimoDTOEntrada entrada, bool fazRegistroNovo)
+        {
+            var emprestimo = this.ConverteDTOParaEmprestimo(entrada);
+            AdicionaDatasEmprestimo(emprestimo, fazRegistroNovo);
+            var mensagensErro = this.VerificaEmprestimoValido(emprestimo);
+            try
+            {
+                if (mensagensErro.Count > 0)
+                {
+                    return ObtemRetornoComErro(mensagensErro, (int)HttpStatusCode.UnprocessableEntity);
+                }
+                _repo.IniciaTransacaoAsync();
+                _repo.SalvaOuAtualiza(emprestimo, fazRegistroNovo);
+                AtualizaQuantidadeLivro(emprestimo, fazRegistroNovo);
+                bool deuCerto = await _repo.SaveChangesAsync();
+                if (deuCerto)
+                {
+                    _repo.ConfirmaTransacaoAsync();
+                    var status = fazRegistroNovo? HttpStatusCode.Created : HttpStatusCode.OK;
+                    return _repo.ObtemResponseSucesso(emprestimo, status);                    
+                }
+                else
+                {
+                    mensagensErro.Add("Falha ao salvar Empréstimo.");
+                    return ObtemRetornoComErro(mensagensErro, (int)HttpStatusCode.BadRequest);                    
+                }
 
-        //    return tabelaExiste;
-        //}
+            }
+            catch (Exception ex)
+            {
+                _repo.CancelaTransacaoAsync();
+                mensagensErro = new List<string>();
+                mensagensErro.Add($"Falha inesperada ao salvar Empréstimo - Exception: {ex.Message}");
+                return ObtemRetornoComErro(mensagensErro, (int)HttpStatusCode.BadRequest);
+                //var response = new CustomResponse { FoiSucesso = false, StatusCode = 400 };
+                //response.ListaMensagens.Add($"Falha inesperada ao salvar Empréstimo - Exception: {ex.Message}");
+                //return BadRequest(response);
+            }
 
-        //public static bool IndiceExisteNaTabela(string nomeTabela, string nomeIndice, GestaoBibliotecaContext contextParam)
-        //{
-        //    bool existe = false;
-        //    //SELECT COUNT(name) FROM sys.indexes WHERE object_id = OBJECT_ID(N'tbEmprestimo') AND name = N'IX_tbItensEmprestimo_emprestimo_id'
-        //    var serviceProvider = new ServiceCollection()
-        //        .AddEntityFrameworkSqlServer()
-        //        .BuildServiceProvider();
-        //    //using (GestaoBibliotecaContext context = new GestaoBibliotecaContext(serviceProvider.GetRequiredService<DbContextOptions<GestaoBibliotecaContext>>()))
-        //    //using (GestaoBibliotecaContext context = new GestaoBibliotecaContext())
-        //    //using (GestaoBibliotecaContext context = contextParam)
-        //    //{
+        }
 
-        //    //    string sql = $"SELECT COUNT(name) FROM sys.indexes WHERE object_id = OBJECT_ID(N'{nomeTabela}') AND name = N'{nomeIndice}';";
-        //    //    existe = context.Database.ExecuteSqlRaw(sql) > 0;
-        //    //}
-        //    string sql = $"SELECT COUNT(name) FROM sys.indexes WHERE object_id = OBJECT_ID(N'{nomeTabela}') AND name = N'{nomeIndice}';";
-        //    existe = contextParam.Database.ExecuteSqlRaw(sql) > 0;
+        private void AtualizaQuantidadeLivro(Emprestimo emprestimo, bool fazRegistroNovo)
+        {
+            emprestimo.ItensEmprestimos.ToList().ForEach(i =>
+            {
+                i.Livro.QuantidadeTotal = i.Livro.QuantidadeTotal - 1;
+            });
+        }
 
-        //    return existe;
+        private void AdicionaDatasEmprestimo(Emprestimo emprestimo, bool fazRegistroNovo)
+        {
+            if(fazRegistroNovo)
+            {
+                DateTime dataAtual = DateTime.Today; // Data atual com hora definida como meia-noite
+                DateTime dataComHora = dataAtual.AddHours(23).AddMinutes(59);
+                emprestimo.DataEmprestimo = dataComHora;
+                emprestimo.DataDevolucao = dataComHora.AddDays(7);
+            }
+        }
 
-        //}
+        public CustomResponse ObtemRetornoComErro(List<string> listaErros, int statusCode)
+        {
+            var response = new CustomResponse { FoiSucesso = false };
+            response.StatusCode = statusCode;
+            response.ListaMensagens = listaErros;
+
+            return response;
+        }
+
+        
     }
 }

@@ -1,6 +1,8 @@
 ﻿using GestaoBiblioteca.Context;
+using GestaoBiblioteca.DTO;
 using GestaoBiblioteca.Entities;
 using Microsoft.EntityFrameworkCore;
+using System.Net;
 
 namespace GestaoBiblioteca.Repositories
 {
@@ -31,6 +33,16 @@ namespace GestaoBiblioteca.Repositories
         public void CancelaTransacaoAsync()
         {
             _context.Database.RollbackTransactionAsync();
+        }
+
+        public void SalvaOuAtualiza<T>(T entity, bool fazRegistroNovo) where T : EntidadePadrao
+        {
+            if (fazRegistroNovo)
+            {                
+                Add(entity);
+            }
+            else
+                Update(entity);
         }
 
         public void Add<T>(T entity) where T : EntidadePadrao
@@ -108,28 +120,27 @@ namespace GestaoBiblioteca.Repositories
             return await query.ToListAsync();
         }
 
-        public Task<Emprestimo> GetEmprestimoByIdAsync(int id)
+        public async Task<Emprestimo> GetEmprestimoByIdAsync(int id)
         {
-            throw new NotImplementedException();
+            IQueryable<Emprestimo> query = _context.Emprestimos;
+            query = query.Include(a => a.ItensEmprestimos)
+                         .ThenInclude(ad => ad.Livro);                         
+
+            query = query.AsNoTracking()
+                         .OrderBy(a => a.Id)
+                         .Where(al => al.Id == id);
+            
+            return await query.FirstOrDefaultAsync();
         }
 
- 
+        public CustomResponse ObtemResponseSucesso<T>(T entity, HttpStatusCode statusCode) where T : EntidadePadrao
+        {
+            var response = new CustomResponse { FoiSucesso = true };
+            response.StatusCode = (int)statusCode;
+            response.Entidade = entity;
 
-
-
-        //public T Add<T>(T entity) where T : EntidadePadrao
-        //{
-        //    _context.Add(entity);
-        //}
-
-        //public T Update<T>(T entity) where T : EntidadePadrao
-        //{
-        //    _context.Update(entity);
-        //}
-        //public void Delete<T>(T entity) where T : EntidadePadrao
-        //{
-        //    _context.Remove(entity);
-        //}
+            return response;
+        }
 
     }
 }

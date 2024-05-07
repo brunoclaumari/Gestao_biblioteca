@@ -1,5 +1,7 @@
 ﻿using GestaoBiblioteca.Context;
+using GestaoBiblioteca.DTO;
 using GestaoBiblioteca.Entities;
+using System.Net;
 
 namespace GestaoBiblioteca.Repositories
 {
@@ -11,6 +13,10 @@ namespace GestaoBiblioteca.Repositories
 
         void Delete<T>(T entity) where T : EntidadePadrao;
 
+        void SalvaOuAtualiza<T>(T entity, bool fazRegistroNovo) where T : EntidadePadrao;
+
+        CustomResponse ObtemResponseSucesso<T>(T entity, HttpStatusCode statusCode) where T : EntidadePadrao;
+
         Task<List<Livro>> GetAllLivrosAsync();
 
         Task<Livro> GetLivroByIdAsync(int id);
@@ -21,16 +27,14 @@ namespace GestaoBiblioteca.Repositories
 
         Task<Emprestimo> GetEmprestimoByIdAsync(int id);
 
-
-
         Task<bool> SaveChangesAsync();
 
         void IniciaTransacaoAsync();
 
         void ConfirmaTransacaoAsync();
 
-        void CancelaTransacaoAsync();        
+        void CancelaTransacaoAsync();       
 
-
+        
     }
 }

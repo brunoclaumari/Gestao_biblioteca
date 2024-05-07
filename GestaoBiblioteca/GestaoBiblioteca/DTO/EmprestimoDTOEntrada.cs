@@ -12,10 +12,10 @@ public class EmprestimoDTOEntrada : EntidadePadraoDTO{
     public int UsuarioId { get; set; }
 
     
-    public DateTime DataEmprestimo { get; set; }
+    //public DateTime DataEmprestimo { get; set; }
 
     
-    public DateTime DataDevolucao { get; set; }
+    //public DateTime DataDevolucao { get; set; }
 
     
     public EnumEmprestimoStatus StatusEmprestimo { get; set; } = EnumEmprestimoStatus.EmAberto;
