@@ -16,6 +16,8 @@ public class Usuario : EntidadePadrao
     public string Nome { get; set; } = string.Empty;
 
     [Column("endereco")]
+    [Required(ErrorMessage = "Campo \"endereço\" é obrigatório!")]
+    [StringLength(250, MinimumLength = 5, ErrorMessage = "O campo nome deve ter entre 5 e 250 caracteres!")]
     public string Endereco { get; set; } = string.Empty;
 
     [Column("data_registro")]

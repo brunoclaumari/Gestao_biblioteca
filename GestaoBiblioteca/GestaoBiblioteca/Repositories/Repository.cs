@@ -1,6 +1,7 @@
 ﻿using GestaoBiblioteca.Context;
 using GestaoBiblioteca.DTO;
 using GestaoBiblioteca.Entities;
+using GestaoBiblioteca.Helpers;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
 
@@ -48,18 +49,6 @@ namespace GestaoBiblioteca.Repositories
         public void Add<T>(T entity) where T : EntidadePadrao
         {
             _context.Add(entity);
-            //try
-            //{
-            //    _context.Database.BeginTransactionAsync();
-            //    _context.Add(entity);           
-
-            //}
-            //catch (Exception ex)
-            //{
-            //    _context.Database.RollbackTransactionAsync();
-
-            //}
-
         }
 
         public void Delete<T>(T entity) where T : EntidadePadrao
@@ -71,8 +60,6 @@ namespace GestaoBiblioteca.Repositories
         {
            _context.Update(entity);
         }
-
-
 
         public async Task<bool> SaveChangesAsync()
         {
@@ -88,9 +75,29 @@ namespace GestaoBiblioteca.Repositories
             return await query.ToListAsync();
         }
 
-        public Task<Livro> GetLivroByIdAsync(int id)
+        public async Task<Livro?> GetLivroByIdAsync(int id)
         {
-            throw new NotImplementedException();
+            var livro = await _context.Livros.FirstOrDefaultAsync(x => x.Id == id);
+
+            return await _context.Livros.FirstOrDefaultAsync(x => x.Id == id);
+        }
+
+        public void DevolveLivro(int livroId)
+        {
+            var livro = GetLivroByIdAsync(livroId);
+            if (livro != null && livro.Result != null)
+            {
+                LivroHelper.Devolve(livro: livro.Result);
+            }
+        }
+
+        public void EmprestaLivro(int livroId)
+        {
+            var livro = GetLivroByIdAsync(livroId);
+            if (livro != null && livro.Result != null)
+            {
+                LivroHelper.Empresta(livro: livro.Result);
+            }
         }
 
         public async Task<List<Emprestimo>> GetAllEmprestimosAsync()
@@ -113,9 +120,8 @@ namespace GestaoBiblioteca.Repositories
             query = query.Include(e => e.ItensEmprestimos)
                             .ThenInclude(em => em.Livro);
 
-            query = query.AsNoTracking().OrderBy(e => e.Id)
-                //.Where(em => em.ItensEmprestimos.Any(i => i. == disciplinaId));
-                .Where(em => em.UsuarioId == usuarioId); 
+            query = query.AsNoTracking().OrderBy(e => e.Id)                
+                            .Where(em => em.UsuarioId == usuarioId); 
 
             return await query.ToListAsync();
         }

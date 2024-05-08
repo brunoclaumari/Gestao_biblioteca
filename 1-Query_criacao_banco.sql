@@ -16,8 +16,21 @@ Como as migrations vão controlar as atualizações no banco, não será necessário
 executar esse script. 
 Mas serve para demonstrar como criar direto no banco.
 
+Será necessário criar o banco GESTAO_BIBLIOTECA no SQL Server, mas as criações
+devem ser feitas através das Migrations do Entity Framework com comando "Update-Database" no Visual Studio 
+
 */
 
+--Cria banco de dados
+IF DB_ID('GESTAO_BIBLIOTECA') IS NOT NULL
+    PRINT('DataBase "GESTAO_BIBLIOTECA" já existe');
+ELSE
+BEGIN
+    --SELECT 0 AS DatabaseExists;
+	PRINT('Criando DataBase "GESTAO_BIBLIOTECA"');
+	CREATE DATABASE GESTAO_BIBLIOTECA;
+END
+GO
 
 USE GESTAO_BIBLIOTECA
 GO
@@ -34,6 +47,7 @@ BEGIN
 		titulo VARCHAR(MAX) NOT NULL,
 		autores VARCHAR(300),
 		genero INT NULL,--genero vai ser um enum no código
+		quantidade_emprestada INT NOT NULL DEFAULT 0,	
 		quantidade_total INT NOT NULL,		
 		CONSTRAINT PK_tbLivro PRIMARY KEY CLUSTERED (id)		
 	);
@@ -96,7 +110,7 @@ BEGIN
 		emprestimo_id	INT NOT NULL,
 		CONSTRAINT PK_tbItensEmprestimo					PRIMARY KEY CLUSTERED (id),
 		CONSTRAINT FK_tbItensEmprestimo_tbLivro			FOREIGN KEY (livro_id)		REFERENCES tbLivro(id), -- Chave estrangeira nomeada 
-		CONSTRAINT FK_tbItensEmprestimo_tbEmprestimo	FOREIGN KEY (emprestimo_id) REFERENCES tbEmprestimo(id) -- Chave estrangeira nomeada 
+		CONSTRAINT FK_tbItensEmprestimo_tbEmprestimo	FOREIGN KEY (emprestimo_id) REFERENCES tbEmprestimo(id) ON DELETE CASCADE -- Chave estrangeira nomeada 
 	);
 END
 GO

@@ -1,6 +1,21 @@
+
+
+/*Procedure importante*/
+CREATE or ALTER PROCEDURE spAtualizaQuantidadeLivroEmprestadoPorID
+    @livro_id INT
+AS
+BEGIN
+    -- Aumenta uma unidade na quantidade de livros emprestados
+    UPDATE tbLivro
+    SET quantidade_emprestada = quantidade_emprestada + 1
+    WHERE id = @livro_id
+END
+GO
+
+
+
+
 /* inserindo Livros (dados mockados iniciais) */
-
-
 
 -- Exemplo 1
 IF NOT EXISTS (SELECT 1 FROM tbLivro WHERE titulo = 'Dom Casmurro' AND autores = 'Machado de Assis')
@@ -150,13 +165,13 @@ BEGIN
 
     -- Inserir registros na tabela tbItensEmprestimo
     INSERT INTO tbItensEmprestimo (livro_id, emprestimo_id) VALUES (1, 1);
-	EXEC spDiminuirQuantidadeLivroPorID @livro_id = 1;
+	EXEC spAtualizaQuantidadeLivroEmprestadoPorID @livro_id = 1;
 
     INSERT INTO tbItensEmprestimo (livro_id, emprestimo_id) VALUES (2, 1);
-	EXEC spDiminuirQuantidadeLivroPorID @livro_id = 2;
+	EXEC spAtualizaQuantidadeLivroEmprestadoPorID @livro_id = 2;
 
     INSERT INTO tbItensEmprestimo (livro_id, emprestimo_id) VALUES (3, 1);
-	EXEC spDiminuirQuantidadeLivroPorID @livro_id = 3;
+	EXEC spAtualizaQuantidadeLivroEmprestadoPorID @livro_id = 3;
 END
 ELSE
 BEGIN
@@ -173,13 +188,13 @@ BEGIN
 
     -- Inserir registros na tabela tbItensEmprestimo
     INSERT INTO tbItensEmprestimo (livro_id, emprestimo_id) VALUES (4, 2);
-	EXEC spDiminuirQuantidadeLivroPorID @livro_id = 4;
+	EXEC spAtualizaQuantidadeLivroEmprestadoPorID @livro_id = 4;
 
     INSERT INTO tbItensEmprestimo (livro_id, emprestimo_id) VALUES (5, 2);
-	EXEC spDiminuirQuantidadeLivroPorID @livro_id = 5;
+	EXEC spAtualizaQuantidadeLivroEmprestadoPorID @livro_id = 5;
 
     INSERT INTO tbItensEmprestimo (livro_id, emprestimo_id) VALUES (6, 2);
-	EXEC spDiminuirQuantidadeLivroPorID @livro_id = 6;
+	EXEC spAtualizaQuantidadeLivroEmprestadoPorID @livro_id = 6;
 
 END
 ELSE
@@ -197,13 +212,13 @@ BEGIN
 
     -- Inserir registros na tabela tbItensEmprestimo
     INSERT INTO tbItensEmprestimo (livro_id, emprestimo_id) VALUES (7, 3);
-	EXEC spDiminuirQuantidadeLivroPorID @livro_id = 7;
+	EXEC spAtualizaQuantidadeLivroEmprestadoPorID @livro_id = 7;
 
     INSERT INTO tbItensEmprestimo (livro_id, emprestimo_id) VALUES (8, 3);
-	EXEC spDiminuirQuantidadeLivroPorID @livro_id = 8;
+	EXEC spAtualizaQuantidadeLivroEmprestadoPorID @livro_id = 8;
 
     INSERT INTO tbItensEmprestimo (livro_id, emprestimo_id) VALUES (9, 3);
-	EXEC spDiminuirQuantidadeLivroPorID @livro_id = 9;
+	EXEC spAtualizaQuantidadeLivroEmprestadoPorID @livro_id = 9;
 END
 ELSE
 BEGIN
@@ -220,13 +235,13 @@ BEGIN
 
     -- Inserir registros na tabela tbItensEmprestimo
     INSERT INTO tbItensEmprestimo (livro_id, emprestimo_id) VALUES (7, 4);
-	EXEC spDiminuirQuantidadeLivroPorID @livro_id = 7;
+	EXEC spAtualizaQuantidadeLivroEmprestadoPorID @livro_id = 7;
 
     INSERT INTO tbItensEmprestimo (livro_id, emprestimo_id) VALUES (8, 4);
-	EXEC spDiminuirQuantidadeLivroPorID @livro_id = 8;
+	EXEC spAtualizaQuantidadeLivroEmprestadoPorID @livro_id = 8;
 
     INSERT INTO tbItensEmprestimo (livro_id, emprestimo_id) VALUES (9, 4);
-	EXEC spDiminuirQuantidadeLivroPorID @livro_id = 9;
+	EXEC spAtualizaQuantidadeLivroEmprestadoPorID @livro_id = 9;
 END
 ELSE
 BEGIN

@@ -19,7 +19,7 @@ namespace GestaoBiblioteca.Repositories
 
         Task<List<Livro>> GetAllLivrosAsync();
 
-        Task<Livro> GetLivroByIdAsync(int id);
+        Task<Livro?> GetLivroByIdAsync(int id);
 
         Task<List<Emprestimo>> GetAllEmprestimosAsync();
 
@@ -33,8 +33,13 @@ namespace GestaoBiblioteca.Repositories
 
         void ConfirmaTransacaoAsync();
 
-        void CancelaTransacaoAsync();       
+        void CancelaTransacaoAsync();
 
-        
+        void EmprestaLivro(int livroId);
+
+        void DevolveLivro(int livroId);
+
+
+
     }
 }

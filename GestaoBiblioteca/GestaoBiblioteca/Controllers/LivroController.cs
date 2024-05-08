@@ -1,4 +1,7 @@
-﻿using GestaoBiblioteca.Entities;
+﻿using AutoMapper;
+using GestaoBiblioteca.DTO;
+using GestaoBiblioteca.Entities;
+using GestaoBiblioteca.Mappers;
 using GestaoBiblioteca.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,14 +15,25 @@ namespace GestaoBiblioteca.Controllers
     {
         private readonly IRepository _repo;
 
+        private readonly IMapper _mapper;
+        /*
+
+        public CourseService(CourseContext courseContext)
+        {
+            _courseContext = courseContext;
+            _mapper = new CourseMapper().RetornaMapperConfiguration().CreateMapper();
+        }
+         */
+
         public LivroController(IRepository repo)
         {
             _repo = repo;
+            _mapper = new BibliotecaMapper().RetornaMapperConfiguration().CreateMapper();
         }
 
         // GET: api/<LivroController>
         [HttpGet]
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> GetAll()
         {
             var retorno = await _repo.GetAllLivrosAsync();
             //var retorno = await teste;
@@ -29,15 +43,29 @@ namespace GestaoBiblioteca.Controllers
 
         // GET api/<LivroController>/5
         [HttpGet("{id}")]
-        public string Get(int id)
+        public async Task<IActionResult> GetById(int id)
         {
-            return "value";
+
+            //Aluno aluno = _smartContext.Alunos.FirstOrDefault(x => x.Id == id);
+            Livro livro = await _repo.GetLivroByIdAsync(id: id);
+
+            if (livro is null) return BadRequest($"Aluno id = {id} não encontrado!!");
+            //var alunoDTO = _mapper.Map<AlunoRegistrarDTO>(aluno);
+
+            return Ok(livro);
         }
 
         // POST api/<LivroController>
         [HttpPost]
-        public void Post([FromBody] string value)
+        public async Task<IActionResult> Post([FromBody] LivroDTO dto)
         {
+            Livro livro = _mapper.Map<Livro>(dto);
+
+            _repo.Add(livro);
+            if (await _repo.SaveChangesAsync())
+                return Created($"/api/Livro", _mapper.Map<LivroDTO>(livro));
+            else
+                return BadRequest("Falha ao salvar Livro.");
         }
 
         // PUT api/<LivroController>/5

@@ -4,6 +4,7 @@ using GestaoBiblioteca.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GestaoBiblioteca.Migrations
 {
     [DbContext(typeof(GestaoBibliotecaContext))]
-    partial class GestaoBibliotecaContextModelSnapshot : ModelSnapshot
+    [Migration("20240508045136_Alterando_tbLivro")]
+    partial class Alterando_tbLivro
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

@@ -6,21 +6,12 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace GestaoBiblioteca.DTO;
 
 
-public class EmprestimoDTOEntrada : EntidadePadraoDTO{
-
+public class EmprestimoDTOEntrada : EmprestimoPadraoDTO
+{
     
     public int UsuarioId { get; set; }
 
-    
-    //public DateTime DataEmprestimo { get; set; }
-
-    
-    //public DateTime DataDevolucao { get; set; }
-
-    
-    public EnumEmprestimoStatus StatusEmprestimo { get; set; } = EnumEmprestimoStatus.EmAberto;
-
     public virtual ICollection<ItensEmprestimoDTO> ItensEmprestimos { get; set; } = new List<ItensEmprestimoDTO>();
 
-    
+
 }

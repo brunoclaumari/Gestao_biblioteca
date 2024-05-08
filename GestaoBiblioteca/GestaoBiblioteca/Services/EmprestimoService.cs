@@ -1,6 +1,7 @@
 ﻿using GestaoBiblioteca.Context;
 using GestaoBiblioteca.DTO;
 using GestaoBiblioteca.Entities;
+using GestaoBiblioteca.Helpers;
 using GestaoBiblioteca.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -18,11 +19,29 @@ namespace GestaoBiblioteca.Services
 
         private readonly IRepository _repo;
 
+        public Emprestimo EmprestimoAntesDeAlterar { get; set; } = new Emprestimo();
+
+        //public ICollection<ItensEmprestimo> ItensEmprestimoAntesAlterar { get; set; }
+
         public EmprestimoService(GestaoBibliotecaContext context, IRepository repo)
         {
             //context = new GestaoBibliotecaContext();
             _context = context;
             _repo = repo;
+        }
+
+        public Emprestimo Clone(Emprestimo e)
+        {
+            return new Emprestimo
+            {
+                Id = e.Id,
+                DataDevolucao = e.DataDevolucao,
+                DataEmprestimo = e.DataEmprestimo,
+                ItensEmprestimos = e.ItensEmprestimos,
+                StatusEmprestimo = e.StatusEmprestimo,
+                Usuario = e.Usuario,
+                UsuarioId = e.UsuarioId
+            };
         }
 
         /// <summary>
@@ -75,12 +94,12 @@ namespace GestaoBiblioteca.Services
                 //if (!listaLivros.Contains(x.Livro))
                 if (livro == null)
                 {
-                    string msg = $"O {x.Livro.ToString()} não está cadastrado.";
+                    string msg = $"O livro id: {x.LivroId} não está cadastrado.";
                     listaErros.Add(msg);
                 }
                 else
                 {
-                    if(livro.QuantidadeTotal == 0)
+                    if(livro.RetornaQuantidadeDisponivel() == 0)
                     {
                         string msg = $"Os exemplares do {x.Livro.ToString()} estão todos emprestados.";
                         listaErros.Add(msg);
@@ -89,38 +108,45 @@ namespace GestaoBiblioteca.Services
             });                        
         }
 
-        public Emprestimo ConverteDTOParaEmprestimo(EmprestimoDTOEntrada dto)
+        public Emprestimo ConverteDTOParaEmprestimo(EmprestimoPadraoDTO dto, bool fazRegistroNovo)
         {
+            Emprestimo emprestimo = new Emprestimo();
             List<ItensEmprestimo> itensEmprestimos = new List<ItensEmprestimo>();
-            dto.ItensEmprestimos.ToList().ForEach(i =>
-            {
-                ItensEmprestimo item = new ItensEmprestimo
-                {
-                    LivroId = i.LivroId,
-                    //EmprestimoId = i.EmprestimoId,    
-                };
-                itensEmprestimos.Add(item);                
-            });
-            Emprestimo emprestimo = new Emprestimo()
+            
+            if (fazRegistroNovo)
             { 
-                ItensEmprestimos = itensEmprestimos,
-                StatusEmprestimo = dto.StatusEmprestimo,
-                UsuarioId = dto.UsuarioId,                
-            };
-
-            if(dto is EmprestimoDTOUpdate)
-            {
-                emprestimo.DataEmprestimo = ((EmprestimoDTOUpdate)dto).DataEmprestimo;
-                emprestimo.DataDevolucao = ((EmprestimoDTOUpdate)dto).DataDevolucao;
+                EmprestimoDTOEntrada dtoEntrada = (EmprestimoDTOEntrada)dto;
+                dtoEntrada.ItensEmprestimos.ToList().ForEach(i =>
+                {
+                    ItensEmprestimo item = new ItensEmprestimo
+                    {
+                        LivroId = i.LivroId,
+                        //EmprestimoId = dto.Id,
+                    };
+                    itensEmprestimos.Add(item);
+                });
+                emprestimo = new Emprestimo()
+                {                    
+                    ItensEmprestimos = itensEmprestimos,
+                    //StatusEmprestimo = dto.StatusEmprestimo,
+                    UsuarioId = dtoEntrada.UsuarioId,
+                };
             }
+            else
+            {
+                emprestimo = EmprestimoAntesDeAlterar;
+                emprestimo.StatusEmprestimo = ((EmprestimoDTOUpdate)dto).StatusEmprestimo;
+            } 
 
             return emprestimo;
         }
 
         
-        public async Task<CustomResponse> FazSalvar(EmprestimoDTOEntrada entrada, bool fazRegistroNovo)
+
+        
+        public async Task<CustomResponse> FazSalvar(EmprestimoPadraoDTO entrada, bool fazRegistroNovo)
         {
-            var emprestimo = this.ConverteDTOParaEmprestimo(entrada);
+            var emprestimo = this.ConverteDTOParaEmprestimo(entrada, fazRegistroNovo);
             AdicionaDatasEmprestimo(emprestimo, fazRegistroNovo);
             var mensagensErro = this.VerificaEmprestimoValido(emprestimo);
             try
@@ -130,8 +156,9 @@ namespace GestaoBiblioteca.Services
                     return ObtemRetornoComErro(mensagensErro, (int)HttpStatusCode.UnprocessableEntity);
                 }
                 _repo.IniciaTransacaoAsync();
+                //ApagaItensEmprestimoSubstituidos();
                 _repo.SalvaOuAtualiza(emprestimo, fazRegistroNovo);
-                AtualizaQuantidadeLivro(emprestimo, fazRegistroNovo);
+                AtualizaQuantidadeLivrosEmprestados(emprestimo, fazRegistroNovo);
                 bool deuCerto = await _repo.SaveChangesAsync();
                 if (deuCerto)
                 {
@@ -159,13 +186,57 @@ namespace GestaoBiblioteca.Services
 
         }
 
-        private void AtualizaQuantidadeLivro(Emprestimo emprestimo, bool fazRegistroNovo)
+        public void AtualizaQuantidadeLivrosEmprestados(Emprestimo emprestimo, bool fazRegistroNovo)
         {
-            emprestimo.ItensEmprestimos.ToList().ForEach(i =>
+            if (fazRegistroNovo)
             {
-                i.Livro.QuantidadeTotal = i.Livro.QuantidadeTotal - 1;
-            });
+                emprestimo.ItensEmprestimos.ToList().ForEach(i =>
+                {
+                    _repo.EmprestaLivro(i.LivroId);
+                });
+            }
+            else
+            {   
+                if(emprestimo.StatusEmprestimo == Enums.EnumEmprestimoStatus.Devolvido)
+                {
+                    foreach (var itensEmprestimo in emprestimo.ItensEmprestimos.ToList())
+                    {
+                        //_repo.DevolveLivro(itensEmprestimo.LivroId);
+                        if(itensEmprestimo.Livro != null)
+                        {
+                            itensEmprestimo.Livro.DevolveLivro();
+                            Console.WriteLine($"Devolver: {itensEmprestimo.LivroId}");
+                        }
+                    }
+                }
+                //Verifica se houve troca de livros no update
+                //List<int> itensAnteriores = ItensEmprestimoAntesAlterar.Select(x => x.LivroId).OrderBy(x => x).ToList();
+                //List<int> itensAtuais = emprestimo.ItensEmprestimos.Select(x => x.LivroId).ToList().OrderBy(x => x).ToList();
+
+                //DevolveLivrosEmprestaLivros(itensAnteriores, itensAtuais);
+
+            }
         }
+
+        //private void DevolveLivrosEmprestaLivros(List<int> anterior, List<int> atual)
+        //{
+        //    List<int> devolver = anterior.Except(atual).ToList();
+        //    List<int> emprestar = atual.Except(anterior).ToList();
+
+        //    //Console.WriteLine(devolver.Count);
+        //    foreach (int livroId in devolver)
+        //    {
+        //        _repo.DevolveLivro(livroId);
+        //        Console.WriteLine($"Devolver: {livroId}");
+        //    }
+
+        //    //Console.WriteLine(emprestar.Count);
+        //    foreach (int livroId in emprestar)
+        //    {
+        //        _repo.EmprestaLivro(livroId);
+        //        Console.WriteLine($"Emprestar: {livroId}");
+        //    }
+        //}
 
         private void AdicionaDatasEmprestimo(Emprestimo emprestimo, bool fazRegistroNovo)
         {

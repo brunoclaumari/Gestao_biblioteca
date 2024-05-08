@@ -2,6 +2,7 @@
 {
     public enum EnumGeneroLivro
     {
+        Indeterminado = 0,
         LiteraturaBrasileira = 1,
         Novela = 2,
         Fantasia = 3,

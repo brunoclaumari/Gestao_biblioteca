@@ -6,7 +6,9 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace GestaoBiblioteca.Entities;
 
 [Table("tbEmprestimo")]
-public class Emprestimo : EntidadePadrao{
+public class Emprestimo : EntidadePadrao {
+
+    
 
     [Column("usuario_id")]
     public int UsuarioId { get; set; }
@@ -27,4 +29,5 @@ public class Emprestimo : EntidadePadrao{
     public virtual ICollection<ItensEmprestimo> ItensEmprestimos { get; set; } = new List<ItensEmprestimo>();
 
     public virtual Usuario Usuario { get; set; } = null!;
+    
 }

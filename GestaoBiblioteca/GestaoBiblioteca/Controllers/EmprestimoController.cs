@@ -87,16 +87,25 @@ namespace GestaoBiblioteca.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            Emprestimo emprestimo = await _repo.GetEmprestimoByIdAsync(id);
-
-            if (emprestimo is null)
+            try
             {
-                var listaErros = new List<string>();
-                listaErros.Add($"Empréstimo id = {id} não encontrado!!");
-                return BadRequest(_service.ObtemRetornoComErro(listaErros, (int)HttpStatusCode.UnprocessableEntity));
-            }
+                Emprestimo emprestimo = await _repo.GetEmprestimoByIdAsync(id);
 
-            return Ok(emprestimo);
+                if (emprestimo is null)
+                {
+                    var listaErros = new List<string>();
+                    listaErros.Add($"Empréstimo id = {id} não encontrado!!");
+                    return BadRequest(_service.ObtemRetornoComErro(listaErros, (int)HttpStatusCode.UnprocessableEntity));
+                }
+
+                return Ok(emprestimo);
+            }
+            catch (Exception e)
+            {
+                var erro = new CustomResponse { FoiSucesso = false };
+                erro.ListaMensagens.Add("Ocorreu um erro inesperado. Verifique os dados de entrada");
+                return BadRequest(erro);
+            }
         }
 
         // POST api/<EmprestimoController>
@@ -108,9 +117,17 @@ namespace GestaoBiblioteca.Controllers
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] EmprestimoDTOEntrada entrada)
         {
-            Task<CustomResponse> response = _service.FazSalvar(entrada, true);
-            return await ObtemResponses(response);
-            
+            try
+            {
+                Task<CustomResponse> response = _service.FazSalvar(entrada, true);
+                return await ObtemResponses(response);
+            }
+            catch (Exception e)
+            {
+                var erro = new CustomResponse { FoiSucesso = false };
+                erro.ListaMensagens.Add("Ocorreu um erro inesperado. Verifique os dados de entrada");
+                return BadRequest(erro);
+            }            
         }
         
 
@@ -124,17 +141,50 @@ namespace GestaoBiblioteca.Controllers
         [HttpPut("{id}")]        
         public async Task<IActionResult> Put(int id, [FromBody] EmprestimoDTOUpdate entrada)
         {
-            Emprestimo emprestimo = await _repo.GetEmprestimoByIdAsync(id);
-
-            if (emprestimo is null)
+            var erro = new CustomResponse { FoiSucesso = false };
+            erro.ListaMensagens.Add("Ocorreu um erro inesperado. Verifique os dados de entrada");
+            try
             {
-                var listaErros = new List<string>();
-                listaErros.Add($"Empréstimo id = {id} não encontrado!!");
-                return BadRequest(_service.ObtemRetornoComErro(listaErros, (int)HttpStatusCode.UnprocessableEntity));
-            }            
+                Emprestimo emprestimo = await _repo.GetEmprestimoByIdAsync(id);
 
-            Task<CustomResponse> response = _service.FazSalvar(entrada, false);
-            return await ObtemResponses(response);
+                if (emprestimo is null)
+                {
+                    var listaErros = new List<string>();
+                    listaErros.Add($"Empréstimo id = {id} não encontrado!!");
+                    return BadRequest(_service.ObtemRetornoComErro(listaErros, (int)HttpStatusCode.UnprocessableEntity));
+                }
+
+                _repo.IniciaTransacaoAsync();
+
+                emprestimo.StatusEmprestimo = entrada.StatusEmprestimo;
+                _service.AtualizaQuantidadeLivrosEmprestados(emprestimo, false);
+
+                _repo.Update(emprestimo);
+                bool deuCerto = await _repo.SaveChangesAsync();
+                if (deuCerto)
+                {
+                    _repo.ConfirmaTransacaoAsync();
+                    return Ok(emprestimo);
+                }
+                else
+                {
+                    _repo.CancelaTransacaoAsync();
+                    return BadRequest(erro);
+                }
+                //return (IActionResult)Task.FromResult(_repo.ObtemResponseSucesso(emprestimo, HttpStatusCode.OK));
+                //_service.EmprestimoAntesDeAlterar = emprestimo;
+                //Task<CustomResponse> response = _service.FazSalvar(entrada, false);
+                //return await ObtemResponses(response);
+
+            }
+            catch (Exception e)
+            {
+                _repo.CancelaTransacaoAsync();
+                
+                return BadRequest(erro);
+            }
+
+
         }
 
 
@@ -149,20 +199,29 @@ namespace GestaoBiblioteca.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             var response = new CustomResponse { FoiSucesso = false };
-            Emprestimo emprestimo = await _repo.GetEmprestimoByIdAsync(id);
-            if (emprestimo is null)
-            {                
-                response.StatusCode = 422;
-                response.ListaMensagens.Add($"Empréstimo id = {id} não encontrado!!");
-                return UnprocessableEntity(response);                
-            }
-            _repo.Delete(emprestimo);
-            if (await _repo.SaveChangesAsync())
-                return NoContent();
-            else
+            try
             {
-                response.StatusCode = 400;
-                response.ListaMensagens.Add($"Não foi possível excluir o Empréstimo id: {id}");
+                Emprestimo emprestimo = await _repo.GetEmprestimoByIdAsync(id);
+                if (emprestimo is null)
+                {
+                    response.StatusCode = 422;
+                    response.ListaMensagens.Add($"Empréstimo id = {id} não encontrado!!");
+                    return UnprocessableEntity(response);
+                }
+                _repo.Delete(emprestimo);
+                if (await _repo.SaveChangesAsync())
+                    return NoContent();
+                else
+                {
+                    response.StatusCode = 400;
+                    response.ListaMensagens.Add($"Não foi possível excluir o Empréstimo id: {id}");
+                    return BadRequest(response);
+                }
+
+            }
+            catch (Exception e)
+            {                
+                response.ListaMensagens.Add("Ocorreu um erro inesperado. Verifique os dados de entrada");
                 return BadRequest(response);
             }
         }
