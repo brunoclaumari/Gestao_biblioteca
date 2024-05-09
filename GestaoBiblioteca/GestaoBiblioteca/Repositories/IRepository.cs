@@ -17,6 +17,12 @@ namespace GestaoBiblioteca.Repositories
 
         CustomResponse ObtemResponseSucesso<T>(T entity, HttpStatusCode statusCode) where T : EntidadePadrao;
 
+        Task<List<Usuario>> GetAllUsuariosAsync(bool incluiEmprestimos = false);
+
+        Task<Usuario?> GetUsuarioByIdAsync(int id);
+
+        Task<Usuario?> GetUsuarioByTelefoneAsync(string telefone);
+
         Task<List<Livro>> GetAllLivrosAsync();
 
         Task<Livro?> GetLivroByIdAsync(int id);
@@ -25,7 +31,7 @@ namespace GestaoBiblioteca.Repositories
 
         Task<List<Emprestimo>> GetEmprestimosByUsuarioIdAsync(int usuarioId);
 
-        Task<Emprestimo> GetEmprestimoByIdAsync(int id);
+        Task<Emprestimo?> GetEmprestimoByIdAsync(int id);
 
         Task<bool> SaveChangesAsync();
 

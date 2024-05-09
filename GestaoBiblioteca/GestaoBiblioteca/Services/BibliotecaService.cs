@@ -1,18 +1,13 @@
 ﻿using GestaoBiblioteca.Context;
 using GestaoBiblioteca.DTO;
 using GestaoBiblioteca.Entities;
-using GestaoBiblioteca.Helpers;
 using GestaoBiblioteca.Repositories;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using System.Linq;
 using System.Net;
-using System.Runtime.CompilerServices;
 
 namespace GestaoBiblioteca.Services
 {
-    public class EmprestimoService
+    public class BibliotecaService
     {
 
         private readonly GestaoBibliotecaContext _context;
@@ -23,26 +18,13 @@ namespace GestaoBiblioteca.Services
 
         //public ICollection<ItensEmprestimo> ItensEmprestimoAntesAlterar { get; set; }
 
-        public EmprestimoService(GestaoBibliotecaContext context, IRepository repo)
+        public BibliotecaService(GestaoBibliotecaContext context, IRepository repo)
         {
             //context = new GestaoBibliotecaContext();
             _context = context;
             _repo = repo;
         }
-
-        public Emprestimo Clone(Emprestimo e)
-        {
-            return new Emprestimo
-            {
-                Id = e.Id,
-                DataDevolucao = e.DataDevolucao,
-                DataEmprestimo = e.DataEmprestimo,
-                ItensEmprestimos = e.ItensEmprestimos,
-                StatusEmprestimo = e.StatusEmprestimo,
-                Usuario = e.Usuario,
-                UsuarioId = e.UsuarioId
-            };
-        }
+        
 
         /// <summary>
         /// Faz verificações do usuário para ver se ele é válido
@@ -70,10 +52,18 @@ namespace GestaoBiblioteca.Services
             }
             else
             {
-               var emprestimosPendentes =  _context.Emprestimos.ToList().FindAll(x => x.DataDevolucao < DateTime.Now);
-                if(emprestimosPendentes != null && emprestimosPendentes.Count > 0)
+                
+               var emprestimosVencidos =  _context.Emprestimos.ToList().FindAll(x => x.DataDevolucao < DateTime.Now);
+                //if(emprestimosVencidos != null && emprestimosVencidos.Count > 0)
+                if (UsuarioPossuiEmprestimoValidoEmAberto(usuarioId))
                 {
-                    mensagemErro = $"Usuário id: {usuarioId} possui empréstimos pendentes. Não é permitido novos empréstimos";
+                    mensagemErro = $"Usuário id: {usuarioId} possui empréstimo vigente. Não é permitido novos empréstimos";
+                    listaErros.Add(mensagemErro);
+                }
+                if (UsuarioPossuiEmprestimoNaoDevolvidoEmAberto(usuarioId))
+                {
+                    mensagemErro = $"Usuário id: {usuarioId} possui empréstimo não devolvido! " +
+                        $"Entre em contato pelo número {usuario.Telefone}";
                     listaErros.Add(mensagemErro);
                 }
             }
@@ -82,6 +72,32 @@ namespace GestaoBiblioteca.Services
             return listaErros;
 
         }
+
+        bool UsuarioPossuiEmprestimoValidoEmAberto(int usuarioId)
+        {
+            DateTime diaHoje = DateTime.Now.Date;
+            bool possuiEmprestimoAberto = false;
+            var emp = _repo.GetEmprestimosByUsuarioIdAsync(usuarioId).Result;
+
+            possuiEmprestimoAberto = emp != null && 
+                (emp.Any(x => x.DataDevolucao.Date.Subtract(diaHoje).Days >= 0 && x.StatusEmprestimo == Enums.EnumEmprestimoStatus.EmAberto));
+
+            return possuiEmprestimoAberto;
+        }
+
+        bool UsuarioPossuiEmprestimoNaoDevolvidoEmAberto(int usuarioId)
+        {
+            DateTime diaHoje = DateTime.Now.Date;
+            bool possuiEmprestimoNaoDevolvido = false;
+            var emp = _repo.GetEmprestimosByUsuarioIdAsync(usuarioId).Result;
+
+            possuiEmprestimoNaoDevolvido = emp != null 
+                && (emp.Any(x => x.DataDevolucao.Date.Subtract(diaHoje).Days < 0 && x.StatusEmprestimo == Enums.EnumEmprestimoStatus.EmAberto));
+
+            return possuiEmprestimoNaoDevolvido;
+        }
+
+
 
         private void FazVerificacoesLivros(Emprestimo emprestimo, List<string> listaErros)
         {            
@@ -141,9 +157,7 @@ namespace GestaoBiblioteca.Services
             return emprestimo;
         }
 
-        
 
-        
         public async Task<CustomResponse> FazSalvar(EmprestimoPadraoDTO entrada, bool fazRegistroNovo)
         {
             var emprestimo = this.ConverteDTOParaEmprestimo(entrada, fazRegistroNovo);
@@ -163,13 +177,13 @@ namespace GestaoBiblioteca.Services
                 if (deuCerto)
                 {
                     _repo.ConfirmaTransacaoAsync();
-                    var status = fazRegistroNovo? HttpStatusCode.Created : HttpStatusCode.OK;
-                    return _repo.ObtemResponseSucesso(emprestimo, status);                    
+                    var status = fazRegistroNovo ? HttpStatusCode.Created : HttpStatusCode.OK;
+                    return _repo.ObtemResponseSucesso(emprestimo, status);
                 }
                 else
                 {
                     mensagensErro.Add("Falha ao salvar Empréstimo.");
-                    return ObtemRetornoComErro(mensagensErro, (int)HttpStatusCode.BadRequest);                    
+                    return ObtemRetornoComErro(mensagensErro, (int)HttpStatusCode.BadRequest);
                 }
 
             }
@@ -179,11 +193,7 @@ namespace GestaoBiblioteca.Services
                 mensagensErro = new List<string>();
                 mensagensErro.Add($"Falha inesperada ao salvar Empréstimo - Exception: {ex.Message}");
                 return ObtemRetornoComErro(mensagensErro, (int)HttpStatusCode.BadRequest);
-                //var response = new CustomResponse { FoiSucesso = false, StatusCode = 400 };
-                //response.ListaMensagens.Add($"Falha inesperada ao salvar Empréstimo - Exception: {ex.Message}");
-                //return BadRequest(response);
             }
-
         }
 
         public void AtualizaQuantidadeLivrosEmprestados(Emprestimo emprestimo, bool fazRegistroNovo)
@@ -209,34 +219,9 @@ namespace GestaoBiblioteca.Services
                         }
                     }
                 }
-                //Verifica se houve troca de livros no update
-                //List<int> itensAnteriores = ItensEmprestimoAntesAlterar.Select(x => x.LivroId).OrderBy(x => x).ToList();
-                //List<int> itensAtuais = emprestimo.ItensEmprestimos.Select(x => x.LivroId).ToList().OrderBy(x => x).ToList();
-
-                //DevolveLivrosEmprestaLivros(itensAnteriores, itensAtuais);
-
             }
         }
 
-        //private void DevolveLivrosEmprestaLivros(List<int> anterior, List<int> atual)
-        //{
-        //    List<int> devolver = anterior.Except(atual).ToList();
-        //    List<int> emprestar = atual.Except(anterior).ToList();
-
-        //    //Console.WriteLine(devolver.Count);
-        //    foreach (int livroId in devolver)
-        //    {
-        //        _repo.DevolveLivro(livroId);
-        //        Console.WriteLine($"Devolver: {livroId}");
-        //    }
-
-        //    //Console.WriteLine(emprestar.Count);
-        //    foreach (int livroId in emprestar)
-        //    {
-        //        _repo.EmprestaLivro(livroId);
-        //        Console.WriteLine($"Emprestar: {livroId}");
-        //    }
-        //}
 
         private void AdicionaDatasEmprestimo(Emprestimo emprestimo, bool fazRegistroNovo)
         {
@@ -258,6 +243,57 @@ namespace GestaoBiblioteca.Services
             return response;
         }
 
-        
+        public bool LivroExisteEmAlgumEmprestimo(Livro livro)
+        {
+            bool existe = false;
+            var emprestimos = ((Repository)_repo).GetEmprestimosByLivroIdAsync(livro.Id);
+
+            existe = emprestimos != null && emprestimos.Result.Count > 0;
+            return existe;
+        }
+
+        /*
+            •	Usuário só pode ser apagado caso não tenha nenhum empréstimo em seu nome
+            •	Não pode repetir telefone
+
+         */
+        public async Task<List<string>> RetornaErrosValidacaoUsuarioNoRegistroAsync(UsuarioDTO usuarioEntrada, bool usuarioNovo = true)
+        {
+            List<string> listaErros = new List<string>();
+            Usuario? usuarioPesquisado = await _repo.GetUsuarioByTelefoneAsync(usuarioEntrada.Telefone);
+            string mensagemErro = $"O telefone {usuarioEntrada.Telefone} já pertence a outro usuário.";
+            if (usuarioNovo)
+            {
+                if (usuarioPesquisado != null)
+                {
+                    listaErros.Add(mensagemErro);
+                }
+
+                return listaErros;
+            }
+            //se for usuário para atualizar continua aqui
+            if (usuarioPesquisado != null && usuarioPesquisado.Id != usuarioEntrada.Id)
+            {
+                listaErros.Add(mensagemErro);
+            }
+
+             return listaErros;
+        }
+
+        public List<string> RetornaErrosValidacaoUsuarioNoDelete(Usuario usuarioDeletar)
+        {
+            List<string> listaErros = new List<string>();
+            int usuarioId = usuarioDeletar.Id;
+            var emp = _repo.GetEmprestimosByUsuarioIdAsync(usuarioId);            
+
+            if (emp != null && emp.Result.Count > 0)
+            {
+                string mensagemErro = $"Não é possível excluir usuário id: {usuarioId}. Possui empréstimo cadastrado.";
+                listaErros.Add(mensagemErro);
+            }
+
+            return listaErros;
+
+        }
     }
 }

@@ -36,7 +36,7 @@ namespace GestaoBiblioteca
                 )
             );
 
-            services.AddScoped<EmprestimoService>();
+            services.AddScoped<BibliotecaService>();
 
             //services.AddScoped<CourseService>();
             services.AddControllers(f =>

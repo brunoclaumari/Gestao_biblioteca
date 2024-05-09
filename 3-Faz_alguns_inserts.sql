@@ -14,7 +14,6 @@ GO
 
 
 
-
 /* inserindo Livros (dados mockados iniciais) */
 
 -- Exemplo 1
@@ -110,46 +109,55 @@ END;
 
 /* inserindo Usuarios (dados mockados iniciais) */
 
+/*
+
+
+
+
+
+
+*/
+
 -- Exemplo 1
 IF NOT EXISTS (SELECT 1 FROM tbUsuario WHERE nome = 'João Martins de Sousa' AND endereco = 'Rua A, 123')
 BEGIN
-    INSERT INTO tbUsuario (nome, endereco, data_registro, data_atualizacao)
-    VALUES ('João Martins de Sousa', 'Rua A, 123', GETDATE(), NULL);
+    INSERT INTO tbUsuario (nome, endereco, data_registro, data_atualizacao, telefone)
+    VALUES ('João Martins de Sousa', 'Rua A, 123', GETDATE(), NULL, '(11) 91234-5678');
 END;
 
 -- Exemplo 2
 IF NOT EXISTS (SELECT 1 FROM tbUsuario WHERE nome = 'Maria do Bairro' AND endereco = 'Avenida B, 456')
 BEGIN
-    INSERT INTO tbUsuario (nome, endereco, data_registro, data_atualizacao)
-    VALUES ('Maria do Bairro', 'Avenida B, 456', GETDATE(), NULL);
+    INSERT INTO tbUsuario (nome, endereco, data_registro, data_atualizacao, telefone)
+    VALUES ('Maria do Bairro', 'Avenida B, 456', GETDATE(), NULL, '(11) 98765-4321');
 END;
 
 -- Exemplo 3
 IF NOT EXISTS (SELECT 1 FROM tbUsuario WHERE nome = 'Pedro Carvalho' AND endereco = 'Rua C, 789')
 BEGIN
-    INSERT INTO tbUsuario (nome, endereco, data_registro, data_atualizacao)
-    VALUES ('Pedro Carvalho', 'Rua C, 789', GETDATE(), NULL);
+    INSERT INTO tbUsuario (nome, endereco, data_registro, data_atualizacao, telefone)
+    VALUES ('Pedro Carvalho', 'Rua C, 789', GETDATE(), NULL, '(11) 99876-5432');
 END;
 
 -- Exemplo 4
 IF NOT EXISTS (SELECT 1 FROM tbUsuario WHERE nome = 'Ana Maria Braga' AND endereco = 'Avenida D, 1011')
 BEGIN
-    INSERT INTO tbUsuario (nome, endereco, data_registro, data_atualizacao)
-    VALUES ('Ana Maria Braga', 'Avenida D, 1011', GETDATE(), NULL);
+    INSERT INTO tbUsuario (nome, endereco, data_registro, data_atualizacao, telefone)
+    VALUES ('Ana Maria Braga', 'Avenida D, 1011', GETDATE(), NULL,'(11) 91111-2222');
 END;
 
 -- Exemplo 5
 IF NOT EXISTS (SELECT 1 FROM tbUsuario WHERE nome = 'Carlos Tramontina' AND endereco = 'Rua E, 1213')
 BEGIN
-    INSERT INTO tbUsuario (nome, endereco, data_registro, data_atualizacao)
-    VALUES ('Carlos Tramontina', 'Rua E, 1213', GETDATE(), NULL);
+    INSERT INTO tbUsuario (nome, endereco, data_registro, data_atualizacao, telefone)
+    VALUES ('Carlos Tramontina', 'Rua E, 1213', GETDATE(), NULL,'(11) 93333-4444');
 END;
 
 -- Exemplo 6
 IF NOT EXISTS (SELECT 1 FROM tbUsuario WHERE nome = 'Laura Miller' AND endereco = 'Avenida F, 1415')
 BEGIN
-    INSERT INTO tbUsuario (nome, endereco, data_registro, data_atualizacao)
-    VALUES ('Laura Miller', 'Avenida F, 1415', GETDATE(), NULL);
+    INSERT INTO tbUsuario (nome, endereco, data_registro, data_atualizacao, telefone)
+    VALUES ('Laura Miller', 'Avenida F, 1415', GETDATE(), NULL,'(11) 96666-7777');
 END;
 
 

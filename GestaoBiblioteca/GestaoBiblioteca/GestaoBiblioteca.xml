@@ -4,6 +4,12 @@
         <name>GestaoBiblioteca</name>
     </assembly>
     <members>
+        <member name="M:GestaoBiblioteca.Controllers.EmprestimoController.Get">
+            <summary>
+            Busca todos os empréstimos de livros
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:GestaoBiblioteca.Controllers.EmprestimoController.GetAllUsuarioId(System.Int32)">
             <summary>
             Obtém o Empréstimo de livros pelo id do Usuário
@@ -27,7 +33,7 @@
         </member>
         <member name="M:GestaoBiblioteca.Controllers.EmprestimoController.Put(System.Int32,GestaoBiblioteca.DTO.EmprestimoDTOUpdate)">
             <summary>
-            Atualiza Empréstimo passando o id
+            Atualiza Empréstimo passando o id. Deve ser usado para dar baixa no empréstimo mudando o status
             </summary>
             <param name="id"></param>
             <param name="entrada"></param>
@@ -36,6 +42,76 @@
         <member name="M:GestaoBiblioteca.Controllers.EmprestimoController.Delete(System.Int32)">
             <summary>
             Apaga um Empréstimo
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GestaoBiblioteca.Controllers.LivroController.GetAll">
+            <summary>
+            Retorna todos os livros cadastrados
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:GestaoBiblioteca.Controllers.LivroController.GetById(System.Int32)">
+            <summary>
+            Retorna o livro pelo id
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GestaoBiblioteca.Controllers.LivroController.Post(GestaoBiblioteca.DTO.LivroDTOEntrada)">
+            <summary>
+            Cadastra um livro novo
+            </summary>
+            <param name="dto"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GestaoBiblioteca.Controllers.LivroController.Put(System.Int32,GestaoBiblioteca.DTO.LivroDTOEntrada)">
+            <summary>
+            Atualiza informações do livro
+            </summary>
+            <param name="id"></param>
+            <param name="entrada"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GestaoBiblioteca.Controllers.LivroController.Delete(System.Int32)">
+            <summary>
+            Exclui um livro pelo id
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GestaoBiblioteca.Controllers.UsuarioController.GetAll">
+            <summary>
+            Retorna todos os usuários cadastrados
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:GestaoBiblioteca.Controllers.UsuarioController.GetById(System.Int32)">
+            <summary>
+            Retorna um usuário pelo id
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GestaoBiblioteca.Controllers.UsuarioController.Post(GestaoBiblioteca.DTO.UsuarioDTO)">
+            <summary>
+            Cadastra um novo usuário
+            </summary>
+            <param name="entrada"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GestaoBiblioteca.Controllers.UsuarioController.Put(System.Int32,GestaoBiblioteca.DTO.UsuarioDTO)">
+            <summary>
+            Atualiza dados de um usuário
+            </summary>
+            <param name="id"></param>
+            <param name="entrada"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GestaoBiblioteca.Controllers.UsuarioController.Delete(System.Int32)">
+            <summary>
+            Apaga um usuário cadastrado
             </summary>
             <param name="id"></param>
             <returns></returns>
@@ -93,7 +169,19 @@
         <member name="M:GestaoBiblioteca.Migrations.Alterando_tbLivro.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
             <inheritdoc />
         </member>
-        <member name="M:GestaoBiblioteca.Services.EmprestimoService.VerificaEmprestimoValido(GestaoBiblioteca.Entities.Emprestimo)">
+        <member name="T:GestaoBiblioteca.Migrations.Add_campo_telefone_tbUsuario">
+            <inheritdoc />
+        </member>
+        <member name="M:GestaoBiblioteca.Migrations.Add_campo_telefone_tbUsuario.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:GestaoBiblioteca.Migrations.Add_campo_telefone_tbUsuario.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:GestaoBiblioteca.Migrations.Add_campo_telefone_tbUsuario.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:GestaoBiblioteca.Services.BibliotecaService.VerificaEmprestimoValido(GestaoBiblioteca.Entities.Emprestimo)">
             <summary>
             Faz verificações do usuário para ver se ele é válido
             </summary>

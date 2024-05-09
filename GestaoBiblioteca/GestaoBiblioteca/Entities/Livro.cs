@@ -13,7 +13,7 @@ public class Livro : EntidadePadrao
 {
     [Column("titulo")]
     [Required(ErrorMessage = "Campo \"título\" é obrigatório!")]
-    [StringLength(200, MinimumLength = 5, ErrorMessage = "O campo nome deve ter entre 5 e 150 caracteres!")]
+    [StringLength(200, MinimumLength = 5, ErrorMessage = "O campo nome deve ter entre 5 e 200 caracteres!")]
     public string Titulo { get; set; } = string.Empty;
 
     [Column("autores")]

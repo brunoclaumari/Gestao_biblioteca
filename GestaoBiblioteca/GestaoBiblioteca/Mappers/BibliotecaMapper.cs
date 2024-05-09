@@ -15,22 +15,31 @@ namespace GestaoBiblioteca.Mappers
 
         public BibliotecaMapper()
         {
-            IniciaConfiguracao();
+            //IniciaConfiguracao();
         }
 
-        public MapperConfiguration? RetornaMapperConfiguration()
+        public MapperConfiguration RetornaMapperConfiguration()
         {
-            return _mapConfig;
+            //return _mapConfig;
+            return _mapConfig = new MapperConfiguration(cfg => {
+                cfg.CreateMap<Livro, LivroDTOEntrada>().ReverseMap();
+                cfg.CreateMap<Livro, LivroDTORetorno>().ReverseMap();
+
+                cfg.CreateMap<Usuario, UsuarioDTO>().ReverseMap();
+                cfg.CreateMap<Usuario, UsuarioDTORetorno>().ReverseMap();
+            });
         }
 
         private void IniciaConfiguracao()
         {
             if(_mapConfig == null)
-            {                
-                var config = new MapperConfiguration(cfg => {
-                    cfg.CreateMap<Livro, LivroDTO>().ReverseMap();
+            {
+                _mapConfig = new MapperConfiguration(cfg => {
+                    cfg.CreateMap<Livro, LivroDTOEntrada>().ReverseMap();
+                    cfg.CreateMap<Livro, LivroDTORetorno>().ReverseMap();
                 });
-                _mapConfig = config;
+                //_mapConfig = config;
+                
             }
         }
 

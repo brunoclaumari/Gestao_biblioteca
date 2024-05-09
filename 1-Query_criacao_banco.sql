@@ -64,6 +64,7 @@ BEGIN
 		id INT IDENTITY(1, 1) NOT NULL,
 		nome VARCHAR(MAX) NOT NULL,		
 		endereco VARCHAR(250) NOT NULL,--tentar facilitar com cep no frontend
+		telefone VARCHAR(20) NOT NULL DEFAULT '',
 		data_registro DATETIME NOT NULL,
 		data_atualizacao DATETIME NULL,
 		possui_pendencias bit NOT NULL DEFAULT 0,

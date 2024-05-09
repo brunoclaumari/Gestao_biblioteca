@@ -16,11 +16,6 @@ namespace GestaoBiblioteca.Repositories
             _context = context;
         }
 
-        //public void IniciaTransacao()
-        //{
-        //    _context.Database.BeginTransactionAsync();
-        //}
-
         public void IniciaTransacaoAsync()
         {
             _context.Database.BeginTransactionAsync();
@@ -63,7 +58,7 @@ namespace GestaoBiblioteca.Repositories
 
         public async Task<bool> SaveChangesAsync()
         {
-            return await _context.SaveChangesAsync() > 1;
+            return await _context.SaveChangesAsync() > 0;
         }
 
         public async Task<List<Livro>> GetAllLivrosAsync()
@@ -77,9 +72,9 @@ namespace GestaoBiblioteca.Repositories
 
         public async Task<Livro?> GetLivroByIdAsync(int id)
         {
-            var livro = await _context.Livros.FirstOrDefaultAsync(x => x.Id == id);
+            //var livro = await _context.Livros.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
 
-            return await _context.Livros.FirstOrDefaultAsync(x => x.Id == id);
+            return await _context.Livros.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
         }
 
         public void DevolveLivro(int livroId)
@@ -98,6 +93,32 @@ namespace GestaoBiblioteca.Repositories
             {
                 LivroHelper.Empresta(livro: livro.Result);
             }
+        }
+
+        public async Task<List<Usuario>> GetAllUsuariosAsync(bool incluiEmprestimos = false)
+        {
+            IQueryable<Usuario> query = _context.Usuarios;
+
+            if (incluiEmprestimos)
+            {
+                query = query.Include(e => e.Emprestimos)
+                .ThenInclude(em => em.ItensEmprestimos);
+            }
+
+            query = query.AsNoTracking().OrderBy(a => a.Id);
+
+            return await query.ToListAsync();
+
+        }
+
+        public async Task<Usuario?> GetUsuarioByIdAsync(int id)
+        {
+            return await _context.Usuarios.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+        }
+
+        public async Task<Usuario?> GetUsuarioByTelefoneAsync(string telefone)
+        {
+            return await _context.Usuarios.FirstOrDefaultAsync(x => x.Telefone == telefone);
         }
 
         public async Task<List<Emprestimo>> GetAllEmprestimosAsync()
@@ -125,8 +146,25 @@ namespace GestaoBiblioteca.Repositories
 
             return await query.ToListAsync();
         }
+        
 
-        public async Task<Emprestimo> GetEmprestimoByIdAsync(int id)
+        public async Task<List<Emprestimo>> GetEmprestimosByLivroIdAsync(int livroId, bool incluiItens = false)
+        {
+            IQueryable<Emprestimo> query = _context.Emprestimos;
+
+            if (incluiItens)
+            {
+                query = query.Include(e => e.ItensEmprestimos)
+                .ThenInclude(em => em.Livro);
+            }
+
+            query = query.AsNoTracking().OrderBy(e => e.Id)
+                            .Where(em => em.ItensEmprestimos.Any(i => i.LivroId == livroId));
+
+            return await query.ToListAsync();
+        }
+
+        public async Task<Emprestimo?> GetEmprestimoByIdAsync(int id)
         {
             IQueryable<Emprestimo> query = _context.Emprestimos;
             query = query.Include(a => a.ItensEmprestimos)
@@ -135,7 +173,7 @@ namespace GestaoBiblioteca.Repositories
             query = query.AsNoTracking()
                          .OrderBy(a => a.Id)
                          .Where(al => al.Id == id);
-            
+
             return await query.FirstOrDefaultAsync();
         }
 
@@ -147,6 +185,5 @@ namespace GestaoBiblioteca.Repositories
 
             return response;
         }
-
     }
 }

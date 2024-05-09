@@ -21,7 +21,8 @@ WHERE e.id = 3
 SELECT * FROM dbo.tbEmprestimo e 
 INNER JOIN tbItensEmprestimo ie ON e.id = ie.emprestimo_id 
 INNER JOIN tbLivro lv ON ie.livro_id = lv.id
-WHERE e.id = 4
+--WHERE e.id = 4
+WHERE e.status_emprestimo = 0
 
 
 

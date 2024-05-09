@@ -16,9 +16,9 @@ namespace GestaoBiblioteca.Controllers
     {
 
         private readonly IRepository _repo;
-        private readonly EmprestimoService _service;
+        private readonly BibliotecaService _service;
 
-        public EmprestimoController(IRepository repo, EmprestimoService service)
+        public EmprestimoController(IRepository repo, BibliotecaService service)
         {
             _repo = repo;
             _service = service;
@@ -26,6 +26,10 @@ namespace GestaoBiblioteca.Controllers
 
 
         // GET: api/<EmprestimoController>
+        /// <summary>
+        /// Busca todos os empréstimos de livros
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         public async Task<IActionResult> Get()
         {
@@ -89,13 +93,13 @@ namespace GestaoBiblioteca.Controllers
         {
             try
             {
-                Emprestimo emprestimo = await _repo.GetEmprestimoByIdAsync(id);
+                Emprestimo? emprestimo = await _repo.GetEmprestimoByIdAsync(id);
 
                 if (emprestimo is null)
                 {
                     var listaErros = new List<string>();
                     listaErros.Add($"Empréstimo id = {id} não encontrado!!");
-                    return BadRequest(_service.ObtemRetornoComErro(listaErros, (int)HttpStatusCode.UnprocessableEntity));
+                    return UnprocessableEntity(_service.ObtemRetornoComErro(listaErros, (int)HttpStatusCode.UnprocessableEntity));
                 }
 
                 return Ok(emprestimo);
@@ -133,7 +137,7 @@ namespace GestaoBiblioteca.Controllers
 
         // PUT api/<EmprestimoController>/5
         /// <summary>
-        /// Atualiza Empréstimo passando o id
+        /// Atualiza Empréstimo passando o id. Deve ser usado para dar baixa no empréstimo mudando o status
         /// </summary>
         /// <param name="id"></param>
         /// <param name="entrada"></param>
@@ -145,7 +149,7 @@ namespace GestaoBiblioteca.Controllers
             erro.ListaMensagens.Add("Ocorreu um erro inesperado. Verifique os dados de entrada");
             try
             {
-                Emprestimo emprestimo = await _repo.GetEmprestimoByIdAsync(id);
+                Emprestimo? emprestimo = await _repo.GetEmprestimoByIdAsync(id);
 
                 if (emprestimo is null)
                 {
@@ -171,16 +175,10 @@ namespace GestaoBiblioteca.Controllers
                     _repo.CancelaTransacaoAsync();
                     return BadRequest(erro);
                 }
-                //return (IActionResult)Task.FromResult(_repo.ObtemResponseSucesso(emprestimo, HttpStatusCode.OK));
-                //_service.EmprestimoAntesDeAlterar = emprestimo;
-                //Task<CustomResponse> response = _service.FazSalvar(entrada, false);
-                //return await ObtemResponses(response);
-
             }
             catch (Exception e)
             {
-                _repo.CancelaTransacaoAsync();
-                
+                _repo.CancelaTransacaoAsync();                
                 return BadRequest(erro);
             }
 
@@ -201,16 +199,29 @@ namespace GestaoBiblioteca.Controllers
             var response = new CustomResponse { FoiSucesso = false };
             try
             {
-                Emprestimo emprestimo = await _repo.GetEmprestimoByIdAsync(id);
+                Emprestimo? emprestimo = await _repo.GetEmprestimoByIdAsync(id);
                 if (emprestimo is null)
                 {
                     response.StatusCode = 422;
                     response.ListaMensagens.Add($"Empréstimo id = {id} não encontrado!!");
                     return UnprocessableEntity(response);
                 }
+                if (emprestimo.StatusEmprestimo != Enums.EnumEmprestimoStatus.Devolvido )
+                {
+                    response.StatusCode = 422;
+                    response.ListaMensagens.Add($"Empréstimo id = {id} ainda está em aberto e não é possível excluir!!");
+                    return UnprocessableEntity(response);
+                }
                 _repo.Delete(emprestimo);
                 if (await _repo.SaveChangesAsync())
-                    return NoContent();
+                {
+                    return Ok(new CustomResponse
+                    {
+                        FoiSucesso=true,
+                        ListaMensagens = new List<string> 
+                        { $"O Empréstimo id: {id}, usuário: {emprestimo.Usuario.Nome} foi deletado com sucesso!" }
+                    });
+                }
                 else
                 {
                     response.StatusCode = 400;
