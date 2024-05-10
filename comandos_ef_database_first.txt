@@ -10,23 +10,24 @@ Scaffold-DbContext "Server=.\BRUNO;Database=GESTAO_BIBLIOTECA;User=sa;Password=1
 
 --Ajuda do entity
 
-get-help entityframeworkcore
+	get-help entityframeworkcore
 
 --adicionar uma migration
 
-Add-Migration nome_da_migration
+	Add-Migration nome_da_migration
+
+-- atualizar o banco de dados
+	Update-Database
+
+--Gerar um script compatível com as migrations
+	
+	Script-Migration
 
 
 
 
-*****Passo a passo para executar em desenvolvimento*****
 
-Acertar a string de conexao com o SQL Server
 
--No Package manager do Visual Studio, rodar
-	Add-Migration Inicia_Tabelas
-
--No banco de dados executar os scripts numero 2 e numero 3
 
 
 
