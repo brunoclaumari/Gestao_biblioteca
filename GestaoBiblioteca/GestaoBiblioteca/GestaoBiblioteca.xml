@@ -116,12 +116,6 @@
             <param name="id"></param>
             <returns></returns>
         </member>
-        <member name="M:GestaoBiblioteca.Controllers.WeatherForecastController.Get">
-            <summary>
-            Teste GetWeatherForecast
-            </summary>
-            <returns></returns>
-        </member>
         <member name="P:GestaoBiblioteca.Entities.Emprestimo.StatusEmprestimo">
             <summary>
             <para>0 = Em aberto</para>
