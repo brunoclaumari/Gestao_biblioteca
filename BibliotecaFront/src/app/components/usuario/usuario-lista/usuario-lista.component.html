@@ -1,0 +1,58 @@
+<!-- <p>courses-list works!</p> -->
+<mat-table mat-table [dataSource]="usuarios" >
+
+  <!-- Coluna nome -->
+  <ng-container matColumnDef="nome">
+    <mat-header-cell  *matHeaderCellDef>Nome do usuário</mat-header-cell>
+    <mat-cell  *matCellDef="let usuario">{{ usuario.nome }}</mat-cell>
+  </ng-container>
+
+    <!-- Coluna telefone -->
+    <ng-container matColumnDef="telefone">
+      <mat-header-cell  *matHeaderCellDef>Telefone</mat-header-cell>
+      <mat-cell  *matCellDef="let usuario">{{ usuario.telefone }}</mat-cell>
+    </ng-container>
+
+        <!-- Coluna DataRegistro -->
+        <ng-container matColumnDef="dataRegistro">
+          <mat-header-cell  *matHeaderCellDef>Data de registro</mat-header-cell>
+          <mat-cell  *matCellDef="let usuario">{{ usuario.dataRegistro }}</mat-cell>
+        </ng-container>
+
+  <!-- Category Column -->
+<!--   <ng-container matColumnDef="category">
+    <mat-header-cell  *matHeaderCellDef>Categoria</mat-header-cell>
+    <mat-cell  *matCellDef="let curso">
+      <div class="categoryConteiner">{{ curso.category }}
+        <mat-icon aria-hidden="false" style="margin-left: 3px" aria-label="Categoria do curso">
+          {{ curso.category | category }}</mat-icon>
+      </div>
+    </mat-cell>
+  </ng-container> -->
+
+  <!-- Actions Column -->
+  <ng-container matColumnDef="actions">
+    <mat-header-cell *matHeaderCellDef class="actionColumnHeader">
+      <button (click)="onAdd()" mat-mini-fab color="accent" aria-label="Adicionar um usuário">
+        <mat-icon>add</mat-icon>
+        <!-- <i class="fa-sharp fa-solid fa-circle-plus"></i> -->
+      </button>
+    </mat-header-cell>
+
+    <mat-cell *matCellDef="let usuario" class="actionColumn" >
+      <button  (click)="onEdit(usuario)" mat-icon-button color="primary" aria-label="Editar usuário">
+        <mat-icon >edit</mat-icon>
+      </button>
+
+      <button  (click)="onDelete(usuario)" mat-icon-button color="warn" aria-label="Remover usuário">
+        <mat-icon>delete</mat-icon>
+      </button>
+    </mat-cell>
+
+  </ng-container>
+  <mat-header-row  *matHeaderRowDef="displayedColumns"></mat-header-row>
+  <mat-row  *matRowDef="let row; columns: displayedColumns"></mat-row>
+</mat-table>
+
+
+<p>usuario-lista works!</p>

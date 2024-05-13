@@ -1,0 +1,29 @@
+/* You can add global styles to this file, and also import other style files */
+@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0");
+
+*,
+*:after,
+*:before {
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+    box-sizing: border-box;
+    text-decoration: none;
+    list-style: none;
+}
+body, html{
+  height: 100%;
+  font-size: 100%;
+  list-style-type: none;
+}
+
+html, body { height: 100%; }
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+
+/* html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; } */

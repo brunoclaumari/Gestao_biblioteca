@@ -1,0 +1,26 @@
+
+<mat-card>
+  <mat-card-content >
+    <mat-toolbar color="primary" class="letraBranca">
+      Usuários do sistema</mat-toolbar
+    >
+    <div class="columnFlex mat-elevation-z8">
+      <app-usuario-lista
+        *ngIf="usuarios$ | async as usuarios; else loading"
+        [usuarios]="usuarios"
+        (add)="onAdd()"
+        (edit)="onEdit($event)"
+        (delete)="onDelete($event)"
+      >
+      </app-usuario-lista>
+
+      <ng-template #loading>
+        <div class="loadingSpinner">
+          <mat-spinner></mat-spinner>
+        </div>
+      </ng-template>
+    </div>
+  </mat-card-content>
+</mat-card>
+
+

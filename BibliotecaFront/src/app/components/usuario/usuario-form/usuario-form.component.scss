@@ -1,0 +1,37 @@
+
+mat-card {
+  max-width: 80%;
+  margin: 2em auto;
+  align-content: center;
+}
+
+.minWidth{
+  width: 100%;
+  min-width: 200px;
+}
+
+.formSpace{
+  padding-right: 100px;
+  padding-left: 100px;
+  padding-top: 40px;
+}
+
+.fieldStyle{
+  width: 100%;
+}
+
+.buttonContainer {
+  display: flex;
+  flex-direction: row;
+  background-color: lavender;
+  justify-content: center;
+}
+
+.buttonStyle{
+  margin-left: 10px;
+  margin-right: 10px;
+  //border-style: solid;
+  //border-width: 0.1px;
+}
+
+

@@ -1,0 +1,41 @@
+<mat-card class="minWidth">
+  <mat-card-header>
+    <mat-toolbar style="margin-bottom: 10px;" color="primary">Cadastro de Usuários</mat-toolbar>
+  </mat-card-header>
+
+    <mat-card-content>
+      <form [formGroup]="form" *ngIf="form" >
+          <input matInput hidden formControlName="id" />
+
+        <app-custom-input nomeLabel="Nome"  nomeCampo="nome" formControlName="nome"
+        [control]="form.get('nome')" [lentghMaximo]="100" [temErros]="temErros"
+        ></app-custom-input>
+
+        <app-custom-input nomeLabel="Telefone" nomeCampo="telefone" formControlName="telefone"
+        [control]="form.get('telefone')"  maskParam="(00) 00000-0000" [temErros]="temErros"
+        ></app-custom-input>
+
+        <app-custom-input nomeLabel="Endereço" nomeCampo="endereco" formControlName="endereco"
+        [control]="form.get('endereco')" [lentghMaximo]="250" [temErros]="temErros"
+        ></app-custom-input>
+
+<!--         <mat-form-field class="fieldStyle" appearance="fill">
+          <mat-label>Categoria</mat-label>
+          <mat-select [(value)]="selected" formControlName="category">
+            <mat-option value="front-end">Front-End</mat-option>
+            <mat-option value="back-end">Back-End</mat-option>
+          </mat-select>
+          <mat-error *ngIf="form.get('category')?.invalid">{{getErrorMessage("category")}}</mat-error>
+
+        </mat-form-field> -->
+      </form>
+    </mat-card-content>
+
+    <mat-card-footer>
+      <mat-card-actions class="buttonContainer">
+        <button mat-raised-button class="buttonStyle" color="primary" (click)="onSubmit()">Salvar</button>
+        <button mat-raised-button class="buttonStyle" (click)="onCancel()" >Cancelar</button>
+      </mat-card-actions>
+    </mat-card-footer>
+  </mat-card>
+

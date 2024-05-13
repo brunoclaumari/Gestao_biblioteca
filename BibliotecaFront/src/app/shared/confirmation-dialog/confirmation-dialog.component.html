@@ -1,0 +1,9 @@
+<div class="dialog__conteiner">
+  <div mat-dialog-content>
+    <p>{{ data }}</p>
+  </div>
+  <div mat-dialog-actions class="containerButton">
+    <button class="botaoConfirmacao" mat-raised-button (click)="onConfirm(true)" color="primary" >Sim</button>
+    <button class="botaoConfirmacao" mat-raised-button (click)="onConfirm(false)" color="warn"  >Não</button>
+  </div>
+</div>

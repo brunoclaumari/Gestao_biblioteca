@@ -1,0 +1,25 @@
+
+mat-card{
+  max-width: 90%;
+  margin: 2em auto;
+  text-align: center;
+  border-radius: 10px;
+}
+
+.letraBranca {
+  color: whitesmoke;
+}
+
+.columnFlex{
+  display: flex;
+  flex-direction: column;
+  min-width: 340px;
+}
+
+.loadingSpinner {
+  padding: 25px;
+  background: rgba($color: #bbebea6c, $alpha: 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
