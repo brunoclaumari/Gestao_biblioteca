@@ -49,6 +49,8 @@ namespace GestaoBiblioteca
                 opt => opt.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore);
 
             services.AddScoped<IRepository, Repository>();
+            //services.AddSingleton<IRepository, Repository>();
+            //services.AddTransient<IRepository, Repository>();
 
             services.AddSwaggerGen(c =>
             {

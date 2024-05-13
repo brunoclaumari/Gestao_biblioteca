@@ -118,7 +118,7 @@ namespace GestaoBiblioteca.Repositories
 
         public async Task<Usuario?> GetUsuarioByTelefoneAsync(string telefone)
         {
-            return await _context.Usuarios.FirstOrDefaultAsync(x => x.Telefone == telefone);
+            return await _context.Usuarios.AsNoTracking().FirstOrDefaultAsync(x => x.Telefone == telefone);
         }
 
         public async Task<List<Emprestimo>> GetAllEmprestimosAsync()
