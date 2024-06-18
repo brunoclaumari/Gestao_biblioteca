@@ -9,9 +9,11 @@
         *ngIf="usuarios$ | async as usuarios; else loading"
         [usuarios]="usuarios"
         (add)="onAdd()"
+        (newEmprestimo)="onNewEmprestimo($event)"
         (edit)="onEdit($event)"
         (delete)="onDelete($event)"
-      >
+        >
+        <!-- (newEmprestimo)="onNewEmprestimo()" -->
       </app-usuario-lista>
 
       <ng-template #loading>

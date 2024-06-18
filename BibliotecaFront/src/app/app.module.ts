@@ -31,6 +31,11 @@ import { CustomInputComponent } from './components/custom-input/custom-input.com
 import { ToastrModule } from 'ngx-toastr';
 import { ConfirmationDialogComponent } from './shared/confirmation-dialog/confirmation-dialog.component';
 import { ErrorDialogComponent } from './shared/error-dialog/error-dialog.component';
+import {MatTooltipModule} from '@angular/material/tooltip';
+import { LivroFormComponent } from './components/livro/livro-form/livro-form.component';
+import { LivroListaComponent } from './components/livro/livro-lista/livro-lista.component';
+import {MatListModule} from '@angular/material/list';
+import {MatDividerModule} from '@angular/material/divider';
 
 @NgModule({
   declarations: [
@@ -40,6 +45,8 @@ import { ErrorDialogComponent } from './shared/error-dialog/error-dialog.compone
     UsuarioListaComponent,
     UsuarioFormComponent,
     LivroComponent,
+    LivroFormComponent,
+    LivroListaComponent,
     EmprestimoComponent,
     EmprestimoFormComponent,
     EmprestimoListaComponent,
@@ -75,7 +82,10 @@ import { ErrorDialogComponent } from './shared/error-dialog/error-dialog.compone
         timeOut:3000,
         progressBar:true,
         progressAnimation: 'increasing'
-    })
+    }),
+    MatTooltipModule,
+    MatDividerModule,
+    MatListModule
 
   ],
   //providers: [],

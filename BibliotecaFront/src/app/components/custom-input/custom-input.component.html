@@ -2,16 +2,18 @@
 <span *ngIf="temErros" style="margin-bottom: -40px; z-index: 10; padding:0px; display: inline-flex;">
   <mat-error *ngIf="control?.invalid">{{ getErrorMessage }}</mat-error>
 </span>
-<mat-form-field appearance="outline" class="fieldStyle">
+<mat-form-field  appearance="outline" class="fieldStyle">
   <mat-label>{{ nomeLabel }}</mat-label>
   <input  #name matInput
   [type]="type"
   [mask]="maskParam"
   [dropSpecialCharacters]="maskParam.length === 0"
   [readonly]="!!isReadOnly"
+
   [formControl]="control"
   [value]="name.value"
   placeholder="Digite o {{nomeCampo}}"
+
   />
   <mat-hint *ngIf="lentghMaximo" align="end">{{name.value.length}}/{{lentghMaximo}}</mat-hint>
 

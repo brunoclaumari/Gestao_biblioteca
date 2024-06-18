@@ -1,1 +1,77 @@
-<p>emprestimo-form works!</p>
+
+
+<mat-card class="minWidth">
+  <mat-card-header>
+    <mat-toolbar style="margin-bottom: 10px;" color="primary">Novo empréstimo</mat-toolbar>
+  </mat-card-header>
+
+    <mat-card-content>
+      <form [formGroup]="form" *ngIf="form" >
+          <input matInput hidden formControlName="id" />
+
+        <app-custom-input nomeLabel="Nome do usuário"  nomeCampo="nomeUsuario" formControlName="nomeUsuario"
+        [control]="form.get('nomeUsuario')" [lentghMaximo]="100" [temErros]="temErros"
+        [isReadOnly]="true"
+        ></app-custom-input>
+
+        <div style="padding-right: 10px;" >
+          <mat-form-field appearance="outline" style="padding-right: 20px;" >
+            <mat-label>Data de empréstimo</mat-label>
+            <input  #name matInput formControlName="dataInicioEmprestimo"  readonly="true" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Data de devolução</mat-label>
+            <input  #name matInput formControlName="dataDevolucaoEmprestimo" readonly="true" />
+          </mat-form-field>
+
+
+        </div>
+
+        <mat-form-field appearance="fill" class="fieldStyle" >
+          <mat-label>Livros</mat-label>
+          <!-- [formControl]="toppings" -->
+          <mat-select [formControl]="toplivro"
+          multiple>
+            <mat-select-trigger>
+              {{ toplivro.value?.[0] != undefined ? toplivro.value?.[0]['titulo'] : ''}}
+                <span *ngIf="(toplivro.value?.length || 0) > 1" class="example-additional-selection">
+                  (+{{(toplivro.value?.length || 0) - 1}} {{toplivro.value?.length === 2 ? 'other' : 'others'}})
+                </span>
+
+            </mat-select-trigger>
+            <mat-option [disabled]="toplivro.value?.length >= 3 && toplivro.value?.[2]['id'] != livro.id"
+              *ngFor="let livro of listaLivros"
+            [value]="livro" [id]="livro.id" >{{livro.titulo}}</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-list *ngFor="let livro of toplivro.value" dense>
+            <mat-list-item >
+              {{livro.titulo}} - {{livro.autores}}
+            </mat-list-item>
+            <mat-divider></mat-divider>
+        </mat-list>
+
+<!--         <mat-list>
+          <mat-list-item>Item 1</mat-list-item>
+          <mat-divider></mat-divider>
+          <mat-list-item>Item 2</mat-list-item>
+          <mat-divider></mat-divider>
+          <mat-list-item>Item 3</mat-list-item>
+        </mat-list>
+        <li *ngFor="let livro of toplivro.value">{{livro.titulo}} - {{livro.autores}}</li>
+      -->
+
+      </form>
+    </mat-card-content>
+
+    <mat-card-footer>
+      <mat-card-actions class="buttonContainer">
+        <button mat-raised-button class="buttonStyle" color="primary" (click)="onSubmit()">Salvar</button>
+        <button mat-raised-button class="buttonStyle" (click)="onCancel()" >Cancelar</button>
+      </mat-card-actions>
+    </mat-card-footer>
+  </mat-card>
+
+

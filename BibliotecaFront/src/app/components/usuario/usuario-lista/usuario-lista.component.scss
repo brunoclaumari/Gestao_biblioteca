@@ -3,19 +3,36 @@
   //margin: auto;
   background-color: aliceblue;
 
-/*   -webkit-border-radius: 25px;
-  -moz-border-radius: 25px;
-  border-radius: 25px; */
   overflow: auto;
   max-height: 600px;
 }
 
+/* .nomeColunas{
+
+
+  //flex: 180px;
+} */
+
+.actions{
+  display: flex;
+
+  justify-content: center;
+
+}
+
 .actionColumn{
-  flex: 0 0 120px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  //flex: 0 160px;
+
 }
 
 .actionColumnHeader{
-  flex: 0 0 90px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+
 }
 
 .loadingSpinner {

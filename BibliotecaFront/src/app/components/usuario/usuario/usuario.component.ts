@@ -8,6 +8,7 @@ import { Usuario } from 'src/app/models/Usuario';
 import { UsuarioService } from 'src/app/services/usuario.service';
 import { ConfirmationDialogComponent } from 'src/app/shared/confirmation-dialog/confirmation-dialog.component';
 import { ErrorDialogComponent } from 'src/app/shared/error-dialog/error-dialog.component';
+import { EmprestimoComponent } from '../../emprestimo/emprestimo/emprestimo.component';
 
 @Component({
   selector: 'app-usuario',
@@ -56,6 +57,16 @@ export class UsuarioComponent implements OnInit {
     this.router.navigate(['edit', usuario.id], {
       relativeTo: this.activeRoute,
     });
+  }
+
+  //onNewEmprestimo(usuario: Usuario){
+  onNewEmprestimo(usuario: Usuario){
+    //debugger
+    let usuarioId = usuario.id;
+    /*
+    this.router.navigate(['emprestimo/new2', usuarioId]); */
+    this.router.navigate(['emprestimo/new2', usuarioId], {queryParams:{ nomeUsuario: usuario.nome}});
+
   }
 
   onDelete(usuario: Usuario) {

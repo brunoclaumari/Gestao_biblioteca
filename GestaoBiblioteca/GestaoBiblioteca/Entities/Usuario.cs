@@ -34,10 +34,48 @@ public class Usuario : EntidadePadrao
     [JsonIgnore]
     public DateTime? DataAtualizacao { get; set; }
 
+    private bool _possuiPendencias;
+
     [Column("possui_pendencias")]
     [DefaultValue(false)]
-    public bool PossuiPendencias { get; set; } = false;
+    public bool PossuiPendencias
+    {
+        get 
+        {
+            _possuiPendencias = PossuiEmprestimoNaoDevolvidoEmAberto() || PossuiEmprestimoValidoEmAberto();
+            return _possuiPendencias;
+            //return _possuiPendencias; 
+        }
+        //set
+        //{
+        //    _possuiPendencias = PossuiEmprestimoNaoDevolvidoEmAberto() || PossuiEmprestimoValidoEmAberto();
+        //}
+    }
 
     [JsonIgnore]
     public virtual ICollection<Emprestimo> Emprestimos { get; set; } = new List<Emprestimo>();
+
+    bool PossuiEmprestimoValidoEmAberto()
+    {
+        var emp = this.Emprestimos.ToList();
+        DateTime diaHoje = DateTime.Now.Date;
+        bool possuiEmprestimoAberto = false;
+
+        possuiEmprestimoAberto = emp != null &&
+            (emp.Any(x => x.DataDevolucao.Date.Subtract(diaHoje).Days >= 0 && x.StatusEmprestimo == Enums.EnumEmprestimoStatus.EmAberto));
+
+        return possuiEmprestimoAberto;
+    }
+
+    public bool PossuiEmprestimoNaoDevolvidoEmAberto()
+    {
+        var emp = this.Emprestimos.ToList();
+        DateTime diaHoje = DateTime.Now.Date;
+        bool possuiEmprestimoNaoDevolvido = false;
+
+        possuiEmprestimoNaoDevolvido = emp != null
+            && (emp.Any(x => x.DataDevolucao.Date.Subtract(diaHoje).Days < 0 && x.StatusEmprestimo == Enums.EnumEmprestimoStatus.EmAberto));
+
+        return possuiEmprestimoNaoDevolvido;
+    }
 }

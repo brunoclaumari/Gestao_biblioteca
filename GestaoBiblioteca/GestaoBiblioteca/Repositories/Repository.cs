@@ -99,11 +99,14 @@ namespace GestaoBiblioteca.Repositories
         {
             IQueryable<Usuario> query = _context.Usuarios;
 
-            if (incluiEmprestimos)
-            {
-                query = query.Include(e => e.Emprestimos)
-                .ThenInclude(em => em.ItensEmprestimos);
-            }
+            //if (incluiEmprestimos)
+            //{
+            //    query = query.Include(e => e.Emprestimos)
+            //    .ThenInclude(em => em.ItensEmprestimos);
+            //}
+
+            query = query.Include(e => e.Emprestimos)
+                        .ThenInclude(em => em.ItensEmprestimos);
 
             query = query.AsNoTracking().OrderBy(a => a.Id);
 
@@ -138,8 +141,9 @@ namespace GestaoBiblioteca.Repositories
         {
             IQueryable<Emprestimo> query = _context.Emprestimos;
 
-            query = query.Include(e => e.ItensEmprestimos)
-                            .ThenInclude(em => em.Livro);
+            query = query.Include(emm => emm.Usuario)
+                         .Include(e => e.ItensEmprestimos)
+                         .ThenInclude(em => em.Livro);
 
             query = query.AsNoTracking().OrderBy(e => e.Id)                
                             .Where(em => em.UsuarioId == usuarioId); 

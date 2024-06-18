@@ -48,7 +48,9 @@ export class CustomInputComponent implements ControlValueAccessor {
   onTouchedCb: ((entry: any) => void) = () =>{};
 
 
-  constructor() { }
+  constructor() {
+    //this.setDisabledState(this.isReadOnly);
+  }
 
   writeValue(v: string) {
     this.value = v;

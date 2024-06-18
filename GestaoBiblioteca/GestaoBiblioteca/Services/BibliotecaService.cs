@@ -73,7 +73,7 @@ namespace GestaoBiblioteca.Services
 
         }
 
-        bool UsuarioPossuiEmprestimoValidoEmAberto(int usuarioId)
+        public bool UsuarioPossuiEmprestimoValidoEmAberto(int usuarioId)
         {
             DateTime diaHoje = DateTime.Now.Date;
             bool possuiEmprestimoAberto = false;
@@ -85,7 +85,7 @@ namespace GestaoBiblioteca.Services
             return possuiEmprestimoAberto;
         }
 
-        bool UsuarioPossuiEmprestimoNaoDevolvidoEmAberto(int usuarioId)
+        public bool UsuarioPossuiEmprestimoNaoDevolvidoEmAberto(int usuarioId)
         {
             DateTime diaHoje = DateTime.Now.Date;
             bool possuiEmprestimoNaoDevolvido = false;
