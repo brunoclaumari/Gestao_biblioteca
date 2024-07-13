@@ -128,7 +128,8 @@ namespace GestaoBiblioteca.Repositories
         {
             IQueryable<Emprestimo> query = _context.Emprestimos;
 
-            query = query.Include(e => e.ItensEmprestimos)
+            query = query.Include(ee => ee.Usuario)
+                            .Include(e => e.ItensEmprestimos)
                             .ThenInclude(em => em.Livro);
 
             query = query.AsNoTracking().OrderBy(a => a.Id);

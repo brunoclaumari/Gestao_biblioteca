@@ -1,10 +1,14 @@
+import { Location } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { Observable, catchError, of } from 'rxjs';
+import { Emprestimo } from 'src/app/models/Emprestimo';
+import { ItensEmprestimo } from 'src/app/models/ItensEmprestimo';
 import { Livro } from 'src/app/models/Livro';
+import { Usuario } from 'src/app/models/Usuario';
 import { EmprestimoService } from 'src/app/services/emprestimo.service';
 import { LivroService } from 'src/app/services/livro.service';
 
@@ -22,8 +26,11 @@ export class EmprestimoFormComponent implements OnInit  {
   listaLivros: Livro[]=[];
 
   temErros:boolean = false;
+  nome_usuario:string = '';
+  selecaoLivrosInvalidos:boolean = false;
 
-  toplivro = new FormControl();//[{"id":'',"titulo":''}]
+  itensEmprestimos = new FormControl();
+
 
 /*   toppings = new FormControl('');
 
@@ -31,9 +38,10 @@ export class EmprestimoFormComponent implements OnInit  {
 
 constructor(
 /*
+*/
+private location: Location,
 private router: Router,
-private location: Location, */
-  private snackBar: MatSnackBar,
+private snackBar: MatSnackBar,
   private emprestimoService: EmprestimoService,
   private toastr: ToastrService,
   private livroService: LivroService,
@@ -46,9 +54,9 @@ private location: Location, */
   ngOnInit(): void {
     this.criarForm();
     let usuarioId = this.activeRoute.snapshot.params['usuarioId'];
-    let nome_usuario = this.activeRoute.snapshot.queryParams['nomeUsuario']
+    this.nome_usuario = this.activeRoute.snapshot.queryParams['nomeUsuario']
     console.log(`usuario: ${usuarioId}`)
-    this.updateUsuario(nome_usuario);
+    this.updateUsuario(this.nome_usuario, usuarioId);
   }
 
   criarForm(){
@@ -61,6 +69,7 @@ private location: Location, */
       nomeUsuario: [{value:'',disable: true} ],
       dataInicioEmprestimo: [dataHoje.toLocaleDateString()],
       dataDevolucaoEmprestimo: [dataEntrega.toLocaleDateString()],
+      //toplivro: new FormControl()
     });
 
     this.form.get('nomeUsuario')?.disable();
@@ -90,25 +99,71 @@ private location: Location, */
     }
   }
 
-  updateUsuario(nome_usuario: string) {
+  updateUsuario(nome_usuario: string, usuario_id:string) {
     //debugger
     this.form.patchValue({
-      nomeUsuario: nome_usuario
-      /* id: usuario.id,
-      nome: usuario.nome,
-      telefone: usuario.telefone.trim(),
-      //dataAtualizacao: usuario.dataAtualizacao,
-      //dataRegistro: usuario.dataAtualizacao,
-      endereco: usuario.endereco, */
+      nomeUsuario: nome_usuario,
+      usuarioId:usuario_id
     });
   }
 
   onSubmit() {
+    //this.focoErro(true);
+    debugger
+    console.log(`Form: ${JSON.stringify(this.form.value)}`);
+    this.selecaoLivrosInvalidos = this.itensEmprestimos.value == null || this.itensEmprestimos.value?.length == 0;
+    if(!this.form.valid || this.selecaoLivrosInvalidos){
+      this.onError("Verifique as mensagens de erro no formulário", "Formulário inválido");
+      //this.focoErro(true);
 
+      return ;
+    }
+
+    debugger
+    let emprestimoF:Emprestimo = {
+      usuarioId: this.form.value['usuarioId'],
+      itensEmprestimos: []
+    }
+
+    for (let i = 0; i < this.itensEmprestimos.value?.length; i++) {
+      let livroObj:ItensEmprestimo = {
+        livroId:this.itensEmprestimos.value?.[i]['id']
+      };
+      emprestimoF.itensEmprestimos?.push(livroObj);
+    }
+
+    //this.emprestimoService.save(this.form.value).subscribe({
+    this.emprestimoService.save(emprestimoF).subscribe({
+      next: (result) => {
+        //debugger
+        //this.focoErro(false);
+        console.log(`Result: ${JSON.stringify(result)}`);
+        this.router.navigate(['usuario']); //{relativeTo:this.activeRoute}
+        this.onSuccess(this.form.value);
+      },
+      error: (erro) => {
+        //this.focoErro(true);
+        this.onError('Falha ao salvar dados para empréstimo !!');
+        return of([]);
+      }
+    });
   }
 
-  onCancel(){
+  selecaoLivro():boolean{
+    //debugger
+    return this.selecaoLivrosInvalidos = this.itensEmprestimos.value == null || this.itensEmprestimos.value?.length == 0;
+  }
 
+  onSuccess(result: Partial<Emprestimo>) {
+    this.toastr.success(`Emprestimo do usuário "${this.nome_usuario}" salvo com sucesso!`, 'Sucesso');
+  }
+
+  onError(msg:string, titulo:string = ''){
+    this.toastr.error(msg, "Ocorreu algum erro");
+  }
+
+  onCancel() {
+    this.location.back();
   }
 
 }

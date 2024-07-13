@@ -202,7 +202,7 @@ namespace GestaoBiblioteca.Services
             {
                 emprestimo.ItensEmprestimos.ToList().ForEach(i =>
                 {
-                    _repo.EmprestaLivro(i.LivroId);
+                    i.Livro.EmprestaLivro();                    
                 });
             }
             else
@@ -210,8 +210,7 @@ namespace GestaoBiblioteca.Services
                 if(emprestimo.StatusEmprestimo == Enums.EnumEmprestimoStatus.Devolvido)
                 {
                     foreach (var itensEmprestimo in emprestimo.ItensEmprestimos.ToList())
-                    {
-                        //_repo.DevolveLivro(itensEmprestimo.LivroId);
+                    {                        
                         if(itensEmprestimo.Livro != null)
                         {
                             itensEmprestimo.Livro.DevolveLivro();

@@ -1,1 +1,55 @@
-<p>emprestimo-lista works!</p>
+
+<mat-table mat-table [dataSource]="emprestimos"  >
+
+  <!-- Coluna id -->
+  <ng-container matColumnDef="id" >
+    <mat-header-cell  *matHeaderCellDef  >Id do empréstimo</mat-header-cell>
+    <mat-cell  *matCellDef="let emprestimo"  >{{ emprestimo.id }}</mat-cell>
+  </ng-container>
+
+  <!-- Coluna nome usuário -->
+  <ng-container matColumnDef="usuario" >
+    <mat-header-cell  *matHeaderCellDef  >Usuário</mat-header-cell>
+    <mat-cell  *matCellDef="let emprestimo"  >{{ emprestimo.usuario.nome }}</mat-cell>
+  </ng-container>
+
+  <!-- Coluna dataEmprestimo   -->
+  <ng-container matColumnDef="dataEmprestimo" >
+    <mat-header-cell  *matHeaderCellDef  >Data de empréstimo</mat-header-cell>
+    <mat-cell  *matCellDef="let emprestimo"  >{{ emprestimo.dataEmprestimo | date : 'dd/MM/yyyy'}}</mat-cell>
+  </ng-container>
+
+  <!-- Coluna dataDevolucao  dataEmprestimo -->
+  <ng-container matColumnDef="dataDevolucao" >
+    <mat-header-cell  *matHeaderCellDef  >Data de devolução</mat-header-cell>
+    <mat-cell  *matCellDef="let emprestimo"  >{{ emprestimo.dataDevolucao | date : 'dd/MM/yyyy'}}</mat-cell>
+  </ng-container>
+
+  <!-- Coluna status -->
+  <ng-container matColumnDef="status" >
+    <mat-header-cell  *matHeaderCellDef  >Status</mat-header-cell>
+    <mat-cell  *matCellDef="let emprestimo"  >{{ emprestimo.statusEmprestimo == 0?'Pendente':'Devolvido' }}</mat-cell>
+  </ng-container>
+
+
+  <!-- Actions Column -->
+  <ng-container matColumnDef="actions">
+    <mat-header-cell *matHeaderCellDef class="actionColumnHeader">Ações</mat-header-cell>
+
+    <mat-cell *matCellDef="let emprestimo" class="actionColumn" >
+      <button [disabled]="emprestimo.statusEmprestimo != 0"  (click)="onEdit(emprestimo)" matTooltip="Faz devolução"
+      mat-icon-button color="primary" aria-label="Devolver">
+        <mat-icon >low_priority</mat-icon>
+      </button>
+
+<!--       <button  (click)="onDelete(usuario)" matTooltip="Apagar"
+      mat-icon-button color="warn" aria-label="Remover usuário">
+        <mat-icon>delete</mat-icon>
+      </button> -->
+    </mat-cell>
+
+  </ng-container>
+  <mat-header-row  *matHeaderRowDef="displayedColumns"></mat-header-row>
+  <mat-row  *matRowDef="let row; columns: displayedColumns"></mat-row>
+</mat-table>
+

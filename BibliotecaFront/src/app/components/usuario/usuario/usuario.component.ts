@@ -63,8 +63,6 @@ export class UsuarioComponent implements OnInit {
   onNewEmprestimo(usuario: Usuario){
     //debugger
     let usuarioId = usuario.id;
-    /*
-    this.router.navigate(['emprestimo/new2', usuarioId]); */
     this.router.navigate(['emprestimo/new2', usuarioId], {queryParams:{ nomeUsuario: usuario.nome}});
 
   }

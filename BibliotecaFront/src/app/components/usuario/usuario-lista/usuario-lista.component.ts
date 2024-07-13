@@ -12,6 +12,7 @@ import { Usuario } from 'src/app/models/Usuario';
 export class UsuarioListaComponent implements OnInit{
 
   @Input() usuarios: Usuario[] = [];
+
   @Output() id: Number = 0;
   @Output() add = new EventEmitter(false);
   @Output() edit = new EventEmitter(false);

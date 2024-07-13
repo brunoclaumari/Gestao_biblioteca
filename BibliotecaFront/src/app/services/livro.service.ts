@@ -14,12 +14,9 @@ export class LivroService {
 
   constructor(private httpClient: HttpClient ) { }
 
-  //private getCoursesEndpoint: string = '/courses';
   list(){
     return this.httpClient.get<Livro[]>((this.BASE_API))
     .pipe(
-      //first(),//se os dados forem estáticos usa-se esse método 'first'
-      //delay(5000),
       tap(livros => console.log(livros))
     );
   }
